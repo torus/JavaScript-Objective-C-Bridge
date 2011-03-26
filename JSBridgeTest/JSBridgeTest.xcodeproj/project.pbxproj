@@ -16,6 +16,9 @@
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
 		28F335F11007B36200424DE2 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28F335F01007B36200424DE2 /* RootViewController.xib */; };
 		9CDE08C3133DDB5800BC5FFC /* JavaScriptBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE08C2133DDB5800BC5FFC /* JavaScriptBridge.m */; };
+		9CDE08DB133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */; };
+		9CDE08F8133DF83F00BC5FFC /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F6133DF83F00BC5FFC /* index.html */; };
+		9CDE08FA133DF85500BC5FFC /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F7133DF83F00BC5FFC /* script.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +37,10 @@
 		8D1107310486CEB800E47090 /* JSBridgeTest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "JSBridgeTest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9CDE08C1133DDB5800BC5FFC /* JavaScriptBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JavaScriptBridge.h; path = ../JavaScriptBridge/JavaScriptBridge.h; sourceTree = SOURCE_ROOT; };
 		9CDE08C2133DDB5800BC5FFC /* JavaScriptBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JavaScriptBridge.m; path = ../JavaScriptBridge/JavaScriptBridge.m; sourceTree = SOURCE_ROOT; };
+		9CDE08D9133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JavaScriptBridgeReceiver.h; path = ../JavaScriptBridge/JavaScriptBridgeReceiver.h; sourceTree = SOURCE_ROOT; };
+		9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JavaScriptBridgeReceiver.m; path = ../JavaScriptBridge/JavaScriptBridgeReceiver.m; sourceTree = SOURCE_ROOT; };
+		9CDE08F6133DF83F00BC5FFC /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = html/index.html; sourceTree = "<group>"; };
+		9CDE08F7133DF83F00BC5FFC /* script.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = script.js; path = html/script.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +66,8 @@
 				28C286E00D94DF7D0034E888 /* RootViewController.m */,
 				1D3623240D0F684500981E51 /* JSBridgeTestAppDelegate.h */,
 				1D3623250D0F684500981E51 /* JSBridgeTestAppDelegate.m */,
+				9CDE08D9133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.h */,
+				9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -95,6 +104,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9CDE08F6133DF83F00BC5FFC /* index.html */,
+				9CDE08F7133DF83F00BC5FFC /* script.js */,
 				28F335F01007B36200424DE2 /* RootViewController.xib */,
 				28AD735F0D9D9599002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* JSBridgeTest-Info.plist */,
@@ -162,6 +173,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CDE08F8133DF83F00BC5FFC /* index.html in Resources */,
+				9CDE08FA133DF85500BC5FFC /* script.js in Resources */,
 				28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */,
 				28F335F11007B36200424DE2 /* RootViewController.xib in Resources */,
 			);
@@ -178,6 +191,7 @@
 				1D3623260D0F684500981E51 /* JSBridgeTestAppDelegate.m in Sources */,
 				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
 				9CDE08C3133DDB5800BC5FFC /* JavaScriptBridge.m in Sources */,
+				9CDE08DB133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

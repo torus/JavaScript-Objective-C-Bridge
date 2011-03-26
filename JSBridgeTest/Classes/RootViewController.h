@@ -7,8 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JavaScriptBridgeReceiver.h"
 
 @interface RootViewController : UITableViewController {
+    UIWebView *webView;
+    JavaScriptBridgeReceiver *receiver;
 }
+
+@property(nonatomic, retain) UIWebView *webView;
+@property(nonatomic, retain) JavaScriptBridgeReceiver *receiver;
 
 @end
