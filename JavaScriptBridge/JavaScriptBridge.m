@@ -12,7 +12,7 @@
 
 @implementation JavaScriptBridge
 
-@synthesize stack;
+@synthesize stack, webView;
 
 - (id)init {
 	[super init];

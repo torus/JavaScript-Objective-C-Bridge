@@ -11,14 +11,18 @@
 
 @interface JavaScriptBridge : NSObject {
 	NSMutableArray *stack;
+    UIWebView *webView;
 }
 
 @property(nonatomic, retain) NSMutableArray *stack;
+@property(nonatomic, retain) UIWebView *webView;
 
 -(void)push:(NSString*)operand;
 -(void)operate:(NSString*)op;
 
 -(void)error:(NSString*)mesg;
+
+-(void)op_callback;
 
 -(void)op_num;
 -(void)op_int;

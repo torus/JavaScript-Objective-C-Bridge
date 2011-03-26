@@ -7,9 +7,25 @@
 //
 
 #import "JavaScriptBridgeReceiver.h"
-#import "JavaScriptBridge.h"
 
 @implementation JavaScriptBridgeReceiver
+
+@synthesize bridge;
+
+- (id)init {
+    [super init];
+    
+    JavaScriptBridge *brdg = [[JavaScriptBridge alloc] init];
+    [self setBridge:brdg];
+    [brdg release];
+    
+    return self;
+}
+
+- (void)dealloc {
+    [super dealloc];
+    [self setBridge:nil];
+}
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *url = [request URL];
@@ -19,25 +35,23 @@
     if ([scheme isEqualToString:@"bridge"]) {
         NSArray *path = [url pathComponents];
         NSLog(@"path: %@", path);
-        
-        JavaScriptBridge *brdg = [[JavaScriptBridge alloc] init];
-        
+
         for (NSString *str in path) {
             unichar head = [str characterAtIndex:0];
             NSString *tail = [str substringFromIndex:1];
             switch (head) {
                 case '-':// operand
-                    [brdg push:tail];
+                    [[self bridge] push:tail];
                     break;
                 case '@':// operator
-                    [brdg operate:tail];
+                    [[self bridge] operate:tail];
                     break;
                 default:
                     break;
             }
             NSLog(@"-- %@", str);
         }
-        
+
         return NO;
     } else {
         return YES;
