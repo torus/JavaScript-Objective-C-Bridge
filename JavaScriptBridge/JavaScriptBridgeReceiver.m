@@ -26,10 +26,10 @@
             unichar head = [str characterAtIndex:0];
             NSString *tail = [str substringFromIndex:1];
             switch (head) {
-                case '-':
+                case '-':// operand
                     [brdg push:tail];
                     break;
-                case '@':
+                case '@':// operator
                     [brdg operate:tail];
                     break;
                 default:
