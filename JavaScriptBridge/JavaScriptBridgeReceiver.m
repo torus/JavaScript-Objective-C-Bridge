@@ -18,7 +18,7 @@
     JavaScriptBridge *brdg = [[JavaScriptBridge alloc] init];
     [self setBridge:brdg];
     [brdg release];
-        
+
     return self;
 }
 
@@ -35,8 +35,6 @@
     if ([scheme isEqualToString:@"bridge"]) {
         NSArray *path = [url pathComponents];
         NSLog(@"path: %@", path);
-
-        [[self bridge] setWebView:webView];
         
         for (NSString *str in path) {
             unichar head = [str characterAtIndex:0];
@@ -54,8 +52,6 @@
             NSLog(@"-- %@", str);
         }
 
-        [[self bridge] setWebView:nil];// avoid circular reference
-        
         return NO;
     } else {
         return YES;

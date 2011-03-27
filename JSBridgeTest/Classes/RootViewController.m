@@ -30,6 +30,8 @@
     [wv setDelegate:recv];
     [self setReceiver:recv];
     [recv release];
+    
+    [[recv bridge] setWebView:wv];
 
     [wv loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"index" ofType:@"html"]]]];
 }
@@ -163,11 +165,18 @@
 - (void)viewDidUnload {
     // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
     // For example: self.myOutlet = nil;
+    [[[self receiver] bridge] setWebView:nil];
+    [self setWebView:nil];
+    [self setReceiver:nil];
 }
 
 
 - (void)dealloc {
     [super dealloc];
+
+    [[[self receiver] bridge] setWebView:nil];
+    [self setWebView:nil];
+    [self setReceiver:nil];
 }
 
 
