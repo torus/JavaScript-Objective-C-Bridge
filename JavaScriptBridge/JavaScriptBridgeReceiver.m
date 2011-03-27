@@ -36,27 +36,31 @@
         NSArray *path = [url pathComponents];
         NSLog(@"path: %@", path);
         
-        for (NSString *str in path) {
-            unichar head = [str characterAtIndex:0];
-            NSString *tail = [str substringFromIndex:1];
-            switch (head) {
-                case '-':// operand
-                    [[self bridge] push:tail];
-                    break;
-                case '@':// operator
-                    [[self bridge] operate:tail];
-                    break;
-                default:
-                    break;
-            }
-            NSLog(@"-- %@", str);
-        }
-
+        [self performSelector:@selector(feedInstructions:) withObject:path];
+        
         return NO;
     } else {
         return YES;
     }
 
+}
+
+- (void)feedInstructions:(NSArray *)instructions {
+    for (NSString *str in instructions) {
+        unichar head = [str characterAtIndex:0];
+        NSString *tail = [str substringFromIndex:1];
+        switch (head) {
+            case '-':// operand
+                [[self bridge] push:tail];
+                break;
+            case '@':// operator
+                [[self bridge] operate:tail];
+                break;
+            default:
+                break;
+        }
+        NSLog(@"-- %@", str);
+    }
 }
 
 @end

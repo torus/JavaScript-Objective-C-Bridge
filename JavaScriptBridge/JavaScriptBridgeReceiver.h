@@ -15,4 +15,6 @@
 
 @property(nonatomic, retain) JavaScriptBridge *bridge;
 
+- (void)feedInstructions:(NSArray *)instructions;
+
 @end
