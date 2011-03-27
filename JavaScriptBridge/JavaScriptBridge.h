@@ -22,6 +22,8 @@
 
 -(void)error:(NSString*)mesg;
 
+-(void)eval:(NSString*)expr;
+
 -(void)op_callback;
 
 -(void)op_num;
@@ -29,8 +31,8 @@
 -(void)op_hexstr;
 
 -(void)op_hmac_sha1;
--(void)op_http_get;
--(void)op_http_post;
+//-(void)op_http_get;
+//-(void)op_http_post;
 
 @end
 

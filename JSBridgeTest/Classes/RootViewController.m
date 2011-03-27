@@ -21,7 +21,8 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 
-    UIWebView *wv = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    UIWebView *wv = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 340, 200)];
+    [[self view] addSubview:wv];
     [self setWebView: wv];
     [wv release];
     

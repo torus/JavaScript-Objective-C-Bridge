@@ -126,6 +126,44 @@
 	}
 }
 
+    // numargs:int, funcname:string, arg:string[, ...] -> (none)
+- (void)op_callback {
+    if ([stack count] > 1) {
+        NSNumber *num = [stack lastObject];
+        [stack removeLastObject];
+        
+        NSString *funcname = [stack lastObject];
+        [stack removeLastObject];
+                
+        NSInteger n = [num integerValue];
+        if ([stack count] > n - 1) {
+            NSMutableArray *args = [[NSMutableArray alloc] init];
+
+            for (int i = 0; i < n; i ++) {
+                NSString *arg = [stack lastObject];
+                [stack removeLastObject];
+
+                    // arg must be a *safe* string, which doesn't contain any control charactor nor ", \, etc...
+                [args addObject:arg];
+            }
+            
+            NSString *expr = [NSString stringWithFormat:@"%@(\"%@\")", funcname,
+                              [args componentsJoinedByString:@"\",\""]];
+            NSLog(@"callback: %@", expr);
+//            [[self webView] stringByEvaluatingJavaScriptFromString:expr];
+            [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
+        } else {
+            [self error:@"ERROR: stack undeflow"];
+        }
+
+    }
+}
+
+- (void)eval:(NSString*)expr {
+    NSLog(@"eval: %@ -> webView: %@", expr, [self webView]);
+    [[self webView] stringByEvaluatingJavaScriptFromString:expr];
+}
+
 // key:string / data:string -> data
 -(void)op_hmac_sha1 {
 	if ([stack count] > 1) {
