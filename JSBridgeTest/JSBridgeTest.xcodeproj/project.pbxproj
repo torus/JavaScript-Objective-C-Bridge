@@ -19,6 +19,7 @@
 		9CDE08DB133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */; };
 		9CDE08F8133DF83F00BC5FFC /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F6133DF83F00BC5FFC /* index.html */; };
 		9CDE08FA133DF85500BC5FFC /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F7133DF83F00BC5FFC /* script.js */; };
+		9CDE09A6133F4A6200BC5FFC /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE09A5133F4A6200BC5FFC /* NSStringAdditions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,8 @@
 		9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JavaScriptBridgeReceiver.m; path = ../JavaScriptBridge/JavaScriptBridgeReceiver.m; sourceTree = SOURCE_ROOT; };
 		9CDE08F6133DF83F00BC5FFC /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = index.html; path = html/index.html; sourceTree = "<group>"; };
 		9CDE08F7133DF83F00BC5FFC /* script.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = script.js; path = html/script.js; sourceTree = "<group>"; };
+		9CDE09A4133F4A6200BC5FFC /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = ../JavaScriptBridge/NSStringAdditions.h; sourceTree = SOURCE_ROOT; };
+		9CDE09A5133F4A6200BC5FFC /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = ../JavaScriptBridge/NSStringAdditions.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				1D3623250D0F684500981E51 /* JSBridgeTestAppDelegate.m */,
 				9CDE08D9133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.h */,
 				9CDE08DA133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m */,
+				9CDE09A4133F4A6200BC5FFC /* NSStringAdditions.h */,
+				9CDE09A5133F4A6200BC5FFC /* NSStringAdditions.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -192,6 +197,7 @@
 				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
 				9CDE08C3133DDB5800BC5FFC /* JavaScriptBridge.m in Sources */,
 				9CDE08DB133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m in Sources */,
+				9CDE09A6133F4A6200BC5FFC /* NSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

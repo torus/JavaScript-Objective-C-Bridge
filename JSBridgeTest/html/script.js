@@ -9,7 +9,7 @@ function hoge (x) {
     e.textContent = x
     document.body.appendChild (e)
     setTimeout (function () {
-        location.href = "bridge:///-hoge/@print"
+        location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print"
     }, 100)
 }
 

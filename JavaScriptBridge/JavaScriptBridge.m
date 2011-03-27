@@ -7,6 +7,8 @@
 //
 
 #import "JavaScriptBridge.h"
+#import "NSStringAdditions.h"
+
 #include <objc/runtime.h>
 #include <CommonCrypto/CommonHMAC.h>
 
@@ -162,6 +164,42 @@
 - (void)eval:(NSString*)expr {
     NSLog(@"eval: %@ -> webView: %@", expr, [self webView]);
     [[self webView] stringByEvaluatingJavaScriptFromString:expr];
+}
+
+// data -> hexstr:string
+- (void)op_hexifydata {
+	if ([stack count] > 0) {
+        NSData *dat = [stack lastObject];
+        [stack removeLastObject];
+        
+        NSMutableString *str = [[NSMutableString alloc] init];
+        const unsigned char *bytes = [dat bytes];
+        NSUInteger len = [dat length];
+        
+        for (NSUInteger i = 0; i < len; i ++) {
+            unsigned char ch = bytes[i];
+            [str appendFormat:@"%02x", ch];
+        }
+        
+        [stack addObject:str];
+        [str release];
+	} else {
+		[self error:@"ERROR: stack underflow"];
+	}
+}
+
+// data -> base64:string
+- (void)op_base64data {
+	if ([stack count] > 0) {
+        NSData *dat = [stack lastObject];
+        [stack removeLastObject];
+        
+        NSString *str = [NSString base64StringFromData:dat length:[dat length]];
+        
+        [stack addObject:str];
+	} else {
+		[self error:@"ERROR: stack underflow"];
+	}
 }
 
 // key:string / data:string -> data
