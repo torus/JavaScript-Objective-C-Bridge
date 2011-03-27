@@ -17,20 +17,18 @@
 @property(nonatomic, retain) NSMutableArray *stack;
 @property(nonatomic, retain) UIWebView *webView;
 
--(void)push:(NSString*)operand;
--(void)operate:(NSString*)op;
+- (void)push:(NSString*)operand;
+- (void)operate:(NSString*)op;
+- (void)error:(NSString*)mesg;
+- (void)eval:(NSString*)expr;
 
--(void)error:(NSString*)mesg;
+- (void)op_callback;
 
--(void)eval:(NSString*)expr;
+- (void)op_num;
+- (void)op_int;
+- (void)op_hexstr;
 
--(void)op_callback;
-
--(void)op_num;
--(void)op_int;
--(void)op_hexstr;
-
--(void)op_hmac_sha1;
+- (void)op_hmac_sha1;
 //-(void)op_http_get;
 //-(void)op_http_post;
 

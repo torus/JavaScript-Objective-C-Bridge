@@ -21,12 +21,12 @@
 	return self;
 }
 
--(void)push:(NSString*)operand {
+- (void)push:(NSString*)operand {
 	[stack addObject:operand];
 	NSLog(@"pushed: %@, [%d]", operand, [stack count]);
 }
 
--(void)operate:(NSString*)op {
+- (void)operate:(NSString*)op {
 	NSLog(@"--> [%d]", [stack count]);
 	NSString *func = [NSString stringWithFormat:@"op_%@", op];
 	char buf[128];
@@ -40,15 +40,15 @@
 	NSLog(@"--> [%d]", [stack count]);
 }
 
--(void)error:(NSString*)mesg {
+- (void)error:(NSString*)mesg {
 	NSLog(@"JavaScript bridge error: %@", mesg);
 }
 
--(void)op_call {
+- (void)op_call {
 }
 
 // string -> number
--(void)op_num {
+- (void)op_num {
 	if ([stack count] > 0) {
 		NSString *str = [stack lastObject];
 		[stack removeLastObject];
@@ -60,7 +60,7 @@
 }
 
 // string -> integer
--(void)op_int {
+- (void)op_int {
 	if ([stack count] > 0) {
 		NSString *str = [stack lastObject];
 		[stack removeLastObject];
@@ -72,7 +72,7 @@
 }
 
 // a:number, b:number -> a+b:number
--(void)op_add {
+- (void)op_add {
 	if ([stack count] > 1) {
 		NSNumber *n1 = [stack lastObject];
 		[stack removeLastObject];
@@ -86,7 +86,7 @@
 }
 
 // any -> (none)
--(void)op_print {
+- (void)op_print {
 	if ([stack count] > 0) {
 		NSString *str = [NSString stringWithFormat:@"%@", [stack lastObject]];
 		[stack removeLastObject];
@@ -97,7 +97,7 @@
 }
 
 // src:string -> data
--(void)op_hexstr {
+- (void)op_hexstr {
 	if ([stack count] > 0) {
 		NSString *str = [stack lastObject];
 		[stack removeLastObject];
@@ -165,7 +165,7 @@
 }
 
 // key:string / data:string -> data
--(void)op_hmac_sha1 {
+- (void)op_hmac_sha1 {
 	if ([stack count] > 1) {
 		NSString *key = [stack lastObject];
 		[stack removeLastObject];
