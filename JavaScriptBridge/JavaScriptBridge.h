@@ -26,6 +26,7 @@
 
 - (void)op_num;
 - (void)op_int;
+- (void)op_str;
 - (void)op_hexstr;
 - (void)op_hexifydata;
 - (void)op_base64data;

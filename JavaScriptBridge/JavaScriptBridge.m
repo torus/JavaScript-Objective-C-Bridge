@@ -74,6 +74,19 @@
 	
 }
 
+// data -> str
+- (void)op_str {
+	if ([stack count] > 0) {
+		NSData *dat = [stack lastObject];
+        NSString *str = [[[NSString alloc] initWithData:dat encoding:NSUTF8StringEncoding] autorelease];
+		[stack removeLastObject];
+		[stack addObject:str];
+	} else {
+		[self error:@"ERROR: stack underflow"];
+	}
+    
+}
+
 // a:number, b:number -> a+b:number
 - (void)op_add {
 	if ([stack count] > 1) {
@@ -106,7 +119,7 @@
 		[stack removeLastObject];
 		
 		NSUInteger len = [str lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
-		NSMutableData *data = [NSMutableData dataWithLength:len / 2];
+		NSMutableData *data = [[NSMutableData alloc] init];
 
 		if (len % 2 > 0) {
 			[self error:@"odd number of character"];
@@ -124,6 +137,7 @@
 
 		NSLog(@"hexstr: %@", data);
 		[stack addObject:data];
+        [data release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}

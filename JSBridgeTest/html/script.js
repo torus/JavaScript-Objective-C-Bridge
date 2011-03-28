@@ -49,6 +49,15 @@ function hoge2 () {
     var e = document.createElement ("p")
     e.textContent = "hoge2"
     document.body.appendChild (e)
+
+    setTimeout (function () {
+        var url = "http://google.com"
+        var hex = ""
+        for (var i = 0; i < url.length; i ++) {
+            hex += url.charCodeAt (i).toString (16)
+        }
+        location.href = "bridge:///-" + hex + "/@hexstr/@str/@http_get"
+    }, 100)
 }
 
 init ();
