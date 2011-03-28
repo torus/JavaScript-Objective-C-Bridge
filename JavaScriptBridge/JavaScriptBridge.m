@@ -92,7 +92,7 @@
     
 }
 
-// a:number, b:number -> a+b:number
+// a:number/string, b:number/string -> a+b:number
 - (void)op_add {
 	if ([stack count] > 1) {
 		NSNumber *n1 = [self pop];
@@ -144,7 +144,7 @@
 	}
 }
 
-    // numargs:int, funcname:string, arg:string[, ...] -> (none)
+    // numargs:int/string, funcname:string, arg:string[, ...] -> (none)
 - (void)op_callback {
     if ([stack count] > 1) {
         NSNumber *num = [self pop];
