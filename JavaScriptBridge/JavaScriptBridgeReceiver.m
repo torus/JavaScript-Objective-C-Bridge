@@ -48,6 +48,7 @@
     for (NSString *str in instructions) {
         unichar head = [str characterAtIndex:0];
         NSString *tail = [str substringFromIndex:1];
+        NSLog(@"-- begin %@", str);
         switch (head) {
             case '-':// operand
                 [[self bridge] push:tail];
@@ -58,7 +59,7 @@
             default:
                 break;
         }
-        NSLog(@"-- %@", str);
+        NSLog(@"-- end %@", str);
     }
 }
 
