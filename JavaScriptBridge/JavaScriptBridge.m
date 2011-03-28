@@ -8,6 +8,7 @@
 
 #import "JavaScriptBridge.h"
 #import "NSStringAdditions.h"
+#import "JavaScriptBridgeURLConnectionHandler.h"
 
 #include <objc/runtime.h>
 #include <CommonCrypto/CommonHMAC.h>
@@ -136,9 +137,12 @@
         
         NSString *funcname = [stack lastObject];
         [stack removeLastObject];
-                
+        
         NSInteger n = [num integerValue];
-        if ([stack count] > n - 1) {
+
+        NSLog(@"callback: [%d] num: %@, %d, func: %@", [stack count], num, n, funcname);
+        
+        if ([stack count] >= n) {
             NSMutableArray *args = [[NSMutableArray alloc] init];
 
             for (int i = 0; i < n; i ++) {
@@ -149,8 +153,8 @@
                 [args addObject:arg];
             }
             
-            NSString *expr = [NSString stringWithFormat:@"%@(\"%@\")", funcname,
-                              [args componentsJoinedByString:@"\",\""]];
+            NSString *arglist = n > 0 ? [NSString stringWithFormat:@"\"%@\"", [args componentsJoinedByString:@"\",\""]] : @"";
+            NSString *expr = [NSString stringWithFormat:@"%@(%@)", funcname, arglist];
             NSLog(@"callback: %@", expr);
 //            [[self webView] stringByEvaluatingJavaScriptFromString:expr];
             [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
@@ -238,7 +242,17 @@
 	}
 }
 
-//-(void)op_http_get;
+- (void)op_http_get {
+    if ([stack count] > 0) {
+        NSString *url = [stack lastObject];
+        [stack removeLastObject];
+        
+        JavaScriptBridgeURLConnectionHandler *hndl = [[JavaScriptBridgeURLConnectionHandler alloc] initWithWebView:[self webView]];
+        [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]] delegate:hndl];
+	} else {
+		[self error:@"ERROR: stack underflow"];
+    }
+}
 //-(void)op_http_post;
 
 @end

@@ -31,7 +31,7 @@
 - (void)op_base64data;
 
 - (void)op_hmac_sha1;
-//-(void)op_http_get;
+- (void)op_http_get;
 //-(void)op_http_post;
 
 @end

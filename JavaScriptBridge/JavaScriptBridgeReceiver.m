@@ -36,13 +36,12 @@
         NSArray *path = [url pathComponents];
         NSLog(@"path: %@", path);
         
-        [self performSelector:@selector(feedInstructions:) withObject:path];
+        [self performSelector:@selector(feedInstructions:) withObject:path afterDelay:0];
         
         return NO;
     } else {
         return YES;
     }
-
 }
 
 - (void)feedInstructions:(NSArray *)instructions {
