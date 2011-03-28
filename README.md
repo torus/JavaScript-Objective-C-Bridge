@@ -1,7 +1,9 @@
 JavaScript-Objective-C Bridge
 =============================
 
-The JavaScript-Objective-C bridge lets you call Objective-C functions from JavaScript code.
+The JavaScript-Objective-C bridge lets you call Objective-C functions from JavaScript code loaded in a UIWebView instance.
+
+Note that this project is currently VERY VERY ALPHA state. Please don't use it:)
 
 Low Level API
 -------------
