@@ -40,7 +40,7 @@ function connectionDidFinishLoading (connid) {
 
 function init () {
     document.body.onload = function () {
-        location.href = "bridge:///-123/-456/@add/-hoge/-1/@int/@callback"
+        location.href = "bridge:///-123/-456/@add/-hoge/-1/@callback"
     }
 }
 
@@ -49,7 +49,7 @@ function hoge (x) {
     e.textContent = x
     document.body.appendChild (e)
     setTimeout (function () {
-        location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print/-hoge2/-0/@int/@callback"
+        location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print/-hoge2/-0/@callback"
     }, 100)
 }
 
