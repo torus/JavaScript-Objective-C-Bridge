@@ -6,10 +6,10 @@
 //  Copyright 2011 Kronecker's Delta Studio. All rights reserved.
 //
 
-#import "JavaScriptBridgeURLConnectionHandler.h"
+#import "JavaScriptBridgeURLConnectionDelegate.h"
 
 
-@implementation JavaScriptBridgeURLConnectionHandler
+@implementation JavaScriptBridgeURLConnectionDelegate
 
 @synthesize webView, connectionID;
 

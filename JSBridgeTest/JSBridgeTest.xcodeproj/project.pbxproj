@@ -20,7 +20,7 @@
 		9CDE08F8133DF83F00BC5FFC /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F6133DF83F00BC5FFC /* index.html */; };
 		9CDE08FA133DF85500BC5FFC /* script.js in Resources */ = {isa = PBXBuildFile; fileRef = 9CDE08F7133DF83F00BC5FFC /* script.js */; };
 		9CDE09A6133F4A6200BC5FFC /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE09A5133F4A6200BC5FFC /* NSStringAdditions.m */; };
-		9CDE09D7133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.m */; };
+		9CDE09D7133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,8 +45,8 @@
 		9CDE08F7133DF83F00BC5FFC /* script.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = script.js; path = html/script.js; sourceTree = "<group>"; };
 		9CDE09A4133F4A6200BC5FFC /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = ../JavaScriptBridge/NSStringAdditions.h; sourceTree = SOURCE_ROOT; };
 		9CDE09A5133F4A6200BC5FFC /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = ../JavaScriptBridge/NSStringAdditions.m; sourceTree = SOURCE_ROOT; };
-		9CDE09D5133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JavaScriptBridgeURLConnectionHandler.h; path = ../JavaScriptBridge/JavaScriptBridgeURLConnectionHandler.h; sourceTree = SOURCE_ROOT; };
-		9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JavaScriptBridgeURLConnectionHandler.m; path = ../JavaScriptBridge/JavaScriptBridgeURLConnectionHandler.m; sourceTree = SOURCE_ROOT; };
+		9CDE09D5133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JavaScriptBridgeURLConnectionDelegate.h; path = ../JavaScriptBridge/JavaScriptBridgeURLConnectionDelegate.h; sourceTree = SOURCE_ROOT; };
+		9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JavaScriptBridgeURLConnectionDelegate.m; path = ../JavaScriptBridge/JavaScriptBridgeURLConnectionDelegate.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,8 +66,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9CDE09D5133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.h */,
-				9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.m */,
+				9CDE09D5133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.h */,
+				9CDE09D6133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.m */,
 				9CDE08C1133DDB5800BC5FFC /* JavaScriptBridge.h */,
 				9CDE08C2133DDB5800BC5FFC /* JavaScriptBridge.m */,
 				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
@@ -203,7 +203,7 @@
 				9CDE08C3133DDB5800BC5FFC /* JavaScriptBridge.m in Sources */,
 				9CDE08DB133DEE1D00BC5FFC /* JavaScriptBridgeReceiver.m in Sources */,
 				9CDE09A6133F4A6200BC5FFC /* NSStringAdditions.m in Sources */,
-				9CDE09D7133FF87800BC5FFC /* JavaScriptBridgeURLConnectionHandler.m in Sources */,
+				9CDE09D7133FF87800BC5FFC /* JavaScriptBridgeURLConnectionDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

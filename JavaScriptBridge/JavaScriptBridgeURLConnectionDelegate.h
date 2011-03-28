@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface JavaScriptBridgeURLConnectionHandler : NSObject {
+@interface JavaScriptBridgeURLConnectionDelegate : NSObject {
     UIWebView *webView;
     NSUInteger connectionID;
 }

@@ -8,7 +8,7 @@
 
 #import "JavaScriptBridge.h"
 #import "NSStringAdditions.h"
-#import "JavaScriptBridgeURLConnectionHandler.h"
+#import "JavaScriptBridgeURLConnectionDelegate.h"
 
 #include <objc/runtime.h>
 #include <CommonCrypto/CommonHMAC.h>
@@ -254,7 +254,7 @@
     if ([stack count] > 0) {
         NSString *url = [self pop];
         
-        JavaScriptBridgeURLConnectionHandler *hndl = [[JavaScriptBridgeURLConnectionHandler alloc] initWithWebView:[self webView]];
+        JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
         [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]] delegate:hndl];
         
         [[self stack] addObject:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
