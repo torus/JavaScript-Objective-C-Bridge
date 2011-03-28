@@ -18,6 +18,7 @@
 @property(nonatomic, retain) UIWebView *webView;
 
 - (void)push:(NSString*)operand;
+- (id)pop;
 - (void)operate:(NSString*)op;
 - (void)error:(NSString*)mesg;
 - (void)eval:(NSString*)expr;
