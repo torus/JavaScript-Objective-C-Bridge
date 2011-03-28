@@ -64,8 +64,14 @@ function hoge2 () {
         for (var i = 0; i < url.length; i ++) {
             hex += url.charCodeAt (i).toString (16)
         }
-        location.href = "bridge:///-" + hex + "/@hexstr/@str/@http_get"
+        location.href = "bridge:///-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
     }, 100)
+}
+
+function hoge3 (connid) {
+    var e = document.createElement ("p")
+    e.textContent = "hoge3" + connid
+    document.body.appendChild (e)
 }
 
 init ();
