@@ -1,3 +1,11 @@
+function __hex (hexdata) {
+    var data = hexdata.replace (/([a-f0-9]){2}/ig, function (x) {
+        return String.fromCharCode (parseInt (x, 16))
+    })
+
+    return data
+}
+
 function connectionDidFailWithError (connid, err) {
     var e = document.createElement ("p")
     e.textContent = "fail: " + err
@@ -6,7 +14,7 @@ function connectionDidFailWithError (connid, err) {
 
 function connectionDidReceiveData (connid, data) {
     var e = document.createElement ("p")
-    e.textContent = "recv: ", data
+    e.textContent = "recv: " + data
     document.body.appendChild (e)
 }
 
