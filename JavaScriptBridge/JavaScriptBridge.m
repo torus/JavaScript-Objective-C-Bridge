@@ -62,7 +62,6 @@
 	if ([stack count] > 0) {
 		NSString *str = [self pop];
 		[stack addObject:[NSNumber numberWithDouble:[str doubleValue]]];
-//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -74,7 +73,6 @@
 	if ([stack count] > 0) {
 		NSString *str = [self pop];
 		[stack addObject:[NSNumber numberWithInteger:[str integerValue]]];
-//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -87,7 +85,6 @@
 		NSData *dat = [self pop];
         NSString *str = [[[NSString alloc] initWithData:dat encoding:NSUTF8StringEncoding] retain];
 		[stack addObject:str];
-//        [dat release];
         [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
@@ -101,8 +98,6 @@
 		NSNumber *n1 = [self pop];
 		NSNumber *n2 = [self pop];
 		[stack addObject:[NSNumber numberWithDouble:[n1 doubleValue] + [n2 doubleValue]]];
-//        [n1 release];
-//        [n2 release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -114,7 +109,6 @@
 	if ([stack count] > 0) {
 		NSString *str = [NSString stringWithFormat:@"%@", [self pop]];
 		NSLog(@"print: %@", str);
-//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -141,7 +135,6 @@
 				[data appendBytes:&chr length:1];
 			}
 		}
-//        [str release];
 
 		NSLog(@"hexstr: %@", data);
 		[stack addObject:data];
@@ -169,22 +162,16 @@
 
                     // arg must be a *safe* string, which doesn't contain any control charactor nor ", \, etc...
                 [args addObject:arg];
-//                [arg release];
             }
             
             NSString *arglist = n > 0 ? [NSString stringWithFormat:@"\"%@\"", [args componentsJoinedByString:@"\",\""]] : @"";
             NSString *expr = [NSString stringWithFormat:@"%@(%@)", funcname, arglist];
             NSLog(@"callback: %@", expr);
-//            [[self webView] stringByEvaluatingJavaScriptFromString:expr];
             [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
             [args release];
         } else {
             [self error:@"ERROR: stack undeflow"];
         }
-        
-//        [num release];
-//        [funcname release];
-
     } else {
         [self error:@"ERROR: stack undeflow"];
     }
@@ -211,7 +198,6 @@
         
         [stack addObject:str];
         [str release];
-//        [dat release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -224,8 +210,6 @@
         NSString *str = [NSString base64StringFromData:dat length:[dat length]];
         
         [stack addObject:str];
-        
-//        [dat release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -260,9 +244,6 @@
 		
 		NSData *dest = [NSData dataWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
 		[stack addObject:dest];
-        
-//        [key release];
-//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -274,8 +255,6 @@
         
         JavaScriptBridgeURLConnectionHandler *hndl = [[JavaScriptBridgeURLConnectionHandler alloc] initWithWebView:[self webView]];
         [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]] delegate:hndl];
-        
-//        [url release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
     }
