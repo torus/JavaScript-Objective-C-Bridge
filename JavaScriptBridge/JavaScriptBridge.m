@@ -25,8 +25,15 @@
 }
 
 - (void)push:(NSString*)operand {
-	[stack addObject:operand];
+	[[self stack] addObject:operand];
 	NSLog(@"pushed: %@, [%d]", operand, [stack count]);
+}
+
+- (id)pop {
+    id obj = [[[[self stack] lastObject] retain] autorelease];
+    [[self stack] removeLastObject];
+    
+    return obj;
 }
 
 - (void)operate:(NSString*)op {
@@ -53,9 +60,9 @@
 // string -> number
 - (void)op_num {
 	if ([stack count] > 0) {
-		NSString *str = [stack lastObject];
-		[stack removeLastObject];
+		NSString *str = [self pop];
 		[stack addObject:[NSNumber numberWithDouble:[str doubleValue]]];
+//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -65,9 +72,9 @@
 // string -> integer
 - (void)op_int {
 	if ([stack count] > 0) {
-		NSString *str = [stack lastObject];
-		[stack removeLastObject];
+		NSString *str = [self pop];
 		[stack addObject:[NSNumber numberWithInteger:[str integerValue]]];
+//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -77,10 +84,11 @@
 // data -> str
 - (void)op_str {
 	if ([stack count] > 0) {
-		NSData *dat = [stack lastObject];
-        NSString *str = [[[NSString alloc] initWithData:dat encoding:NSUTF8StringEncoding] autorelease];
-		[stack removeLastObject];
+		NSData *dat = [self pop];
+        NSString *str = [[[NSString alloc] initWithData:dat encoding:NSUTF8StringEncoding] retain];
 		[stack addObject:str];
+//        [dat release];
+        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -90,11 +98,11 @@
 // a:number, b:number -> a+b:number
 - (void)op_add {
 	if ([stack count] > 1) {
-		NSNumber *n1 = [stack lastObject];
-		[stack removeLastObject];
-		NSNumber *n2 = [stack lastObject];
-		[stack removeLastObject];
+		NSNumber *n1 = [self pop];
+		NSNumber *n2 = [self pop];
 		[stack addObject:[NSNumber numberWithDouble:[n1 doubleValue] + [n2 doubleValue]]];
+//        [n1 release];
+//        [n2 release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -104,9 +112,9 @@
 // any -> (none)
 - (void)op_print {
 	if ([stack count] > 0) {
-		NSString *str = [NSString stringWithFormat:@"%@", [stack lastObject]];
-		[stack removeLastObject];
+		NSString *str = [NSString stringWithFormat:@"%@", [self pop]];
 		NSLog(@"print: %@", str);
+//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -115,8 +123,7 @@
 // src:string -> data
 - (void)op_hexstr {
 	if ([stack count] > 0) {
-		NSString *str = [stack lastObject];
-		[stack removeLastObject];
+		NSString *str = [self pop];
 		
 		NSUInteger len = [str lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
 		NSMutableData *data = [[NSMutableData alloc] init];
@@ -134,6 +141,7 @@
 				[data appendBytes:&chr length:1];
 			}
 		}
+//        [str release];
 
 		NSLog(@"hexstr: %@", data);
 		[stack addObject:data];
@@ -146,11 +154,8 @@
     // numargs:int, funcname:string, arg:string[, ...] -> (none)
 - (void)op_callback {
     if ([stack count] > 1) {
-        NSNumber *num = [stack lastObject];
-        [stack removeLastObject];
-        
-        NSString *funcname = [stack lastObject];
-        [stack removeLastObject];
+        NSNumber *num = [self pop];
+        NSString *funcname = [self pop];
         
         NSInteger n = [num integerValue];
 
@@ -160,11 +165,11 @@
             NSMutableArray *args = [[NSMutableArray alloc] init];
 
             for (int i = 0; i < n; i ++) {
-                NSString *arg = [stack lastObject];
-                [stack removeLastObject];
+                NSString *arg = [self pop];
 
                     // arg must be a *safe* string, which doesn't contain any control charactor nor ", \, etc...
                 [args addObject:arg];
+//                [arg release];
             }
             
             NSString *arglist = n > 0 ? [NSString stringWithFormat:@"\"%@\"", [args componentsJoinedByString:@"\",\""]] : @"";
@@ -172,10 +177,16 @@
             NSLog(@"callback: %@", expr);
 //            [[self webView] stringByEvaluatingJavaScriptFromString:expr];
             [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
+            [args release];
         } else {
             [self error:@"ERROR: stack undeflow"];
         }
+        
+//        [num release];
+//        [funcname release];
 
+    } else {
+        [self error:@"ERROR: stack undeflow"];
     }
 }
 
@@ -187,8 +198,7 @@
 // data -> hexstr:string
 - (void)op_hexifydata {
 	if ([stack count] > 0) {
-        NSData *dat = [stack lastObject];
-        [stack removeLastObject];
+        NSData *dat = [self pop];
         
         NSMutableString *str = [[NSMutableString alloc] init];
         const unsigned char *bytes = [dat bytes];
@@ -201,6 +211,7 @@
         
         [stack addObject:str];
         [str release];
+//        [dat release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -209,12 +220,12 @@
 // data -> base64:string
 - (void)op_base64data {
 	if ([stack count] > 0) {
-        NSData *dat = [stack lastObject];
-        [stack removeLastObject];
-        
+        NSData *dat = [self pop];
         NSString *str = [NSString base64StringFromData:dat length:[dat length]];
         
         [stack addObject:str];
+        
+//        [dat release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -223,8 +234,7 @@
 // key:string / data:string -> data
 - (void)op_hmac_sha1 {
 	if ([stack count] > 1) {
-		NSString *key = [stack lastObject];
-		[stack removeLastObject];
+		NSString *key = [self pop];
 		NSLog(@"hmac_sha1: key: %@", key);
 		
 		// The length does not include space for a terminating NULL character.
@@ -233,8 +243,7 @@
 		// The maximum number of bytes in the string to return in buffer (including the NULL termination byte).
 		[key getCString:keybuf maxLength:keylen + 1 encoding:NSASCIIStringEncoding];
 		
-		NSString *str = [stack lastObject];
-		[stack removeLastObject];
+		NSString *str = [self pop];
 		NSLog(@"hmac_sha1: str: %@", str);
 
 		// The length does not include space for a terminating NULL character.
@@ -251,6 +260,9 @@
 		
 		NSData *dest = [NSData dataWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
 		[stack addObject:dest];
+        
+//        [key release];
+//        [str release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
 	}
@@ -258,11 +270,12 @@
 
 - (void)op_http_get {
     if ([stack count] > 0) {
-        NSString *url = [stack lastObject];
-        [stack removeLastObject];
+        NSString *url = [self pop];
         
         JavaScriptBridgeURLConnectionHandler *hndl = [[JavaScriptBridgeURLConnectionHandler alloc] initWithWebView:[self webView]];
         [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]] delegate:hndl];
+        
+//        [url release];
 	} else {
 		[self error:@"ERROR: stack underflow"];
     }
