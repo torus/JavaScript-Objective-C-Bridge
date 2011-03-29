@@ -17,8 +17,9 @@
 @property(nonatomic, retain) NSMutableArray *stack;
 @property(nonatomic, retain) UIWebView *webView;
 
-- (void)push:(NSString*)operand;
+- (void)push:(id)operand;
 - (id)pop;
+- (int)stackDepth;
 - (void)operate:(NSString*)op;
 - (void)error:(NSString*)mesg;
 - (void)eval:(NSString*)expr;
