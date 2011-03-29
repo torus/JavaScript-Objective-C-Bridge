@@ -252,16 +252,21 @@
 // url:string -> connectionID:string
 - (void)op_http_get {
     if ([stack count] > 0) {
-        NSString *url = [self pop];
+        NSString *url_str = [self pop];
         
         JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-        [NSURLConnection connectionWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]] delegate:hndl];
+        
+        NSURL *url = [NSURL URLWithString:url_str];
+        NSURLRequest *req = [NSURLRequest requestWithURL:url];
+        
+        [NSURLConnection connectionWithRequest:req delegate:hndl];
         
         [[self stack] addObject:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 	} else {
 		[self error:@"ERROR: stack underflow"];
     }
 }
+
 //-(void)op_http_post;
 
 @end
