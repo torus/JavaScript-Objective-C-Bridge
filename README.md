@@ -1,6 +1,10 @@
 JavaScript-Objective-C Bridge
 =============================
 
+The JavaScript-Objective-C bridge lets you call Objective-C functions from JavaScript code loaded in a UIWebView instance.
+
+Note that this project is currently VERY VERY ALPHA state. Please don't use it:)
+
 Low Level API
 -------------
 
@@ -15,7 +19,7 @@ For example:
 In this example, list of instructions is represented as `-123/-456/@add/-hoge/-1/@callback`.
 A path component beginning with `-` means a operand, and a path component beginning with `@` means operator.
 
-Operators are defined as methods of the `JavaScriptBridge` class.
+Operators are defined as methods of the `JavaScriptBridge` class.  See the source code for more detail.
 
 
 License
