@@ -58,69 +58,89 @@
 	NSLog(@"JavaScript bridge error: %@", mesg);
 }
 
+#define CHECK_STACK_DEPTH(n) \
+do {\
+    const char *name = sel_getName(_cmd);\
+    NSLog(@"method = %s", name);\
+    if ([self stackDepth] < n) {\
+        [self error:[NSString stringWithFormat:@"%s: stack underflow", name]];\
+        return;\
+    }\
+} while (0)
+
+
 - (void)op_call {
 }
 
 // string -> number
 - (void)op_num {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+    
+//	if ([self stackDepth] > 0) {
 		NSString *str = [self pop];
 		[self push:[NSNumber numberWithDouble:[str doubleValue]]];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 
 }
 
 // string -> integer
 - (void)op_int {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+    
+//	if ([self stackDepth] > 0) {
 		NSString *str = [self pop];
 		[self push:[NSNumber numberWithInteger:[str integerValue]]];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 	
 }
 
 // data -> str
 - (void)op_str {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+//	if ([self stackDepth] > 0) {
 		NSData *dat = [self pop];
         NSString *str = [[[NSString alloc] initWithData:dat encoding:NSUTF8StringEncoding] retain];
 		[self push:str];
         [str release];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
     
 }
 
 // a:number/string, b:number/string -> a+b:number
 - (void)op_add {
-	if ([self stackDepth] > 1) {
+    CHECK_STACK_DEPTH(2);
+//	if ([self stackDepth] > 1) {
 		NSNumber *n1 = [self pop];
 		NSNumber *n2 = [self pop];
 		[self push:[NSNumber numberWithDouble:[n1 doubleValue] + [n2 doubleValue]]];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 	
 }
 
 // any -> (none)
 - (void)op_print {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+//	if ([self stackDepth] > 0) {
 		NSString *str = [NSString stringWithFormat:@"%@", [self pop]];
 		NSLog(@"print: %@", str);
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 }
 
 // src:string -> data
 - (void)op_hexstr {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+    
+//	if ([self stackDepth] > 0) {
 		NSString *str = [self pop];
 		
 		NSUInteger len = [str lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
@@ -143,22 +163,25 @@
 		NSLog(@"hexstr: %@", data);
 		[self push:data];
         [data release];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 }
 
-    // numargs:int/string, funcname:string, arg:string[, ...] -> (none)
+// numargs:int/string, funcname:string, arg:string[, ...] -> (none)
 - (void)op_callback {
-    if ([self stackDepth] > 1) {
+    CHECK_STACK_DEPTH(2);
+    
+//    if ([self stackDepth] > 1) {
         NSNumber *num = [self pop];
         NSString *funcname = [self pop];
         
         NSInteger n = [num integerValue];
 
         NSLog(@"callback: [%d] num: %@, %d, func: %@", [self stackDepth], num, n, funcname);
-        
-        if ([self stackDepth] >= n) {
+
+    CHECK_STACK_DEPTH(n);
+//        if ([self stackDepth] >= n) {
             NSMutableArray *args = [[NSMutableArray alloc] init];
 
             for (int i = 0; i < n; i ++) {
@@ -173,12 +196,12 @@
             NSLog(@"callback: %@", expr);
             [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
             [args release];
-        } else {
-            [self error:@"ERROR: stack undeflow"];
-        }
-    } else {
-        [self error:@"ERROR: stack undeflow"];
-    }
+//        } else {
+//            [self error:@"ERROR: stack undeflow"];
+//        }
+//    } else {
+//        [self error:@"ERROR: stack undeflow"];
+//    }
 }
 
 - (void)eval:(NSString*)expr {
@@ -188,40 +211,49 @@
 
 // data -> hexstr:string
 - (void)op_hexifydata {
-	if ([self stackDepth] > 0) {
-        NSData *dat = [self pop];
-        
-        NSMutableString *str = [[NSMutableString alloc] init];
-        const unsigned char *bytes = [dat bytes];
-        NSUInteger len = [dat length];
-        
-        for (NSUInteger i = 0; i < len; i ++) {
-            unsigned char ch = bytes[i];
-            [str appendFormat:@"%02x", ch];
-        }
-        
-        [self push:str];
-        [str release];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//    const char *name = sel_getName(_cmd);
+//    NSLog(@"method = %s", name);
+//    
+//	if (! [self stackDepth] > 0) {
+//		[self error:[NSString stringWithFormat:@"%s: stack underflow", name]];
+//        return;
+//	}
+    CHECK_STACK_DEPTH(1);
+
+    NSData *dat = [self pop];
+    
+    NSMutableString *str = [[NSMutableString alloc] init];
+    const unsigned char *bytes = [dat bytes];
+    NSUInteger len = [dat length];
+    
+    for (NSUInteger i = 0; i < len; i ++) {
+        unsigned char ch = bytes[i];
+        [str appendFormat:@"%02x", ch];
+    }
+    
+    [self push:str];
+    [str release];
 }
 
 // data -> base64:string
 - (void)op_base64data {
-	if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+    
+//	if ([self stackDepth] > 0) {
         NSData *dat = [self pop];
         NSString *str = [NSString base64StringFromData:dat length:[dat length]];
         
         [self push:str];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 }
 
 // key:string / data:string -> data
 - (void)op_hmac_sha1 {
-	if ([self stackDepth] > 1) {
+    CHECK_STACK_DEPTH(2);
+    
+//	if ([self stackDepth] > 1) {
 		NSString *key = [self pop];
 		NSLog(@"hmac_sha1: key: %@", key);
 		
@@ -248,14 +280,16 @@
 		
 		NSData *dest = [NSData dataWithBytes:digest length:CC_SHA1_DIGEST_LENGTH];
 		[self push:dest];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-	}
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//	}
 }
 
 // url:string -> connectionID:string
 - (void)op_http_get {
-    if ([self stackDepth] > 0) {
+    CHECK_STACK_DEPTH(1);
+    
+//    if ([self stackDepth] > 0) {
         NSString *url_str = [self pop];
         
         JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
@@ -265,10 +299,10 @@
         
         [NSURLConnection connectionWithRequest:req delegate:hndl];
         
-        [[self stack] addObject:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
-	} else {
-		[self error:@"ERROR: stack underflow"];
-    }
+        [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+//	} else {
+//		[self error:@"ERROR: stack underflow"];
+//    }
 }
 
 //-(void)op_http_post;

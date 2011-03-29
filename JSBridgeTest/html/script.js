@@ -72,6 +72,10 @@ function hoge3 (connid) {
     var e = document.createElement ("p")
     e.textContent = "hoge3" + connid
     document.body.appendChild (e)
+
+    setTimeout (function () {
+        location.href = "bridge:///@hexifydata" // causes error
+    }, 100)
 }
 
 init ();
