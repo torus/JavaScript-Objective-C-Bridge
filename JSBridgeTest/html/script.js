@@ -14,7 +14,7 @@ function connectionDidFailWithError (connid, err) {
 
 function connectionDidReceiveData (connid, data) {
     var e = document.createElement ("p")
-    e.textContent = "recv: " + data
+    e.textContent = "recv: " + data.length
     document.body.appendChild (e)
 }
 
