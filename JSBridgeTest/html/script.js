@@ -38,13 +38,62 @@ function connectionDidFinishLoading (connid) {
 
 ////////////////////
 
+function create_stack () {
+    return []
+}
+
+function stack_push_raw_string (st, val) {
+    st.push ("-" + val)
+}
+
+function stack_push_operator (st, op) {
+    st.push ("@" + op)
+}
+
+function hexify (str) {
+    var hex = ""
+    for (var i = 0; i < str.length; i ++) {
+        hex += url.charCodeAt (i).toString (16)
+    }
+
+    return hex
+}
+
+function stack_push_string (st, op) {
+    if (typeof (op) != "string")
+        op = op.toString ()
+
+    if (op.match (/^[a-zA-Z0-9!@#$%^&*()_+{}|\[\]\:";'<>?,]*$/)) {
+        stack_push_raw_string (st, op)
+    } else {
+        stack_push_raw_string (st, hexify (op))
+    }
+}
+
+function stack_execute (st) {
+    var uri = "bridge:///" + st.join ("/")
+    $("pre").append ("\nexecute: " + uri)
+    setTimeout (function () {
+        location.href = uri
+    }, 100)
+}
+
+
+///////////////////
+
 function init () {
     $(document).ready (function () {
         $("pre").text ("ready")
 
-        setTimeout (function () {
-            location.href = "bridge:///-123/-456/@add/-hoge/-1/@callback"
-        }, 10)
+        var stack = create_stack ()
+        stack_push_string (stack, 123)
+        stack_push_string (stack, 456)
+        stack_push_operator (stack, "add")
+        stack_push_string (stack, "hoge")
+        stack_push_string (stack, 1)
+        stack_push_operator (stack, "callback")
+
+        stack_execute (stack)
     })
 }
 
@@ -57,9 +106,7 @@ function hoge (x) {
 }
 
 function hoge2 () {
-    var e = document.createElement ("p")
-    e.textContent = "hoge2"
-    document.body.appendChild (e)
+    $("pre").append ("\n" + "hoge2")
 
     setTimeout (function () {
         var url = "http://scrw.in/"
@@ -72,9 +119,7 @@ function hoge2 () {
 }
 
 function hoge3 (connid) {
-    var e = document.createElement ("p")
-    e.textContent = "hoge3" + connid
-    document.body.appendChild (e)
+    $("pre").append ("\n" + "hoge3" + connid)
 
     setTimeout (function () {
         location.href = "bridge:///@hexifydata" // causes error
