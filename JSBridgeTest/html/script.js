@@ -113,7 +113,10 @@ function hoge (x) {
     $("pre").append ("\n" + x)
 
     var jsb = new JSBridgeStack ()
-    jsb.push (123, 456).operate ("add").push ("hoge", 1).operate ("callback").execute ()
+    jsb.push ("hoge", "key").operate ("hmac_sha1").operate ("base64data").operate ("print").push ("hoge2", 0).operate ("callback").execute ()
+    // setTimeout (function () {
+    //     location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print/-hoge2/-0/@callback"
+    // }, 100)
 }
 
 function hoge2 () {
@@ -125,12 +128,14 @@ function hoge2 () {
         for (var i = 0; i < url.length; i ++) {
             hex += url.charCodeAt (i).toString (16)
         }
-        location.href = "bridge:///-Value2/-X-Scrw-Ex/-Value1/-X-Scrw-Id/-2/-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
+        location.href = "bridge:///-Value2%01%02%21%22%23/-X-Scrw-Ex/-Value1/-X-Scrw-Id/-2/-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
     }, 100)
 }
 
 function hoge3 (connid) {
     $("pre").append ("\n" + "hoge3" + connid)
+
+    var mesg = '<chat-entry room="opakapaka"><from><user-by-nickname><string>Toru</string></user-by-nickname><avatar-image><string>http://www.gravatar.com/avatar/5efc507a8db7167e2db7889a5597a3cd?s=40&amp;default=identicon</string></avatar-image></from><content><string>abcde</string></content></chat-entry>'
 
     setTimeout (function () {
         location.href = "bridge:///@hexifydata" // causes error
