@@ -94,6 +94,10 @@ JSBridgeStack.prototype.operate = function (op) {
     return this
 }
 
+JSBridgeStack.prototype.execute = function () {
+    stack_execute (this.stack)
+}
+
 ///////////////////
 
 function init () {
@@ -101,9 +105,7 @@ function init () {
         $("pre").text ("ready")
 
         var jsb = new JSBridgeStack ()
-        jsb.push (123, 456).operate ("add").push ("hoge", 1).operate ("callback")
-
-        stack_execute (jsb.stack)
+        jsb.push (123, 456).operate ("add").push ("hoge", 1).operate ("callback").execute ()
     })
 }
 
