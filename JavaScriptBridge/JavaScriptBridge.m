@@ -62,7 +62,7 @@
 do {\
     const char *name = sel_getName(_cmd);\
     NSLog(@"method = %s", name);\
-    if ([self stackDepth] < n) {\
+    if ([self stackDepth] < (n)) {\
         [self error:[NSString stringWithFormat:@"%s: stack underflow", name]];\
         return;\
     }\
@@ -238,17 +238,24 @@ do {\
     [self push:dest];
 }
 
-// url:string -> connectionID:string
+// url:string, num_header:number, header_field:string, header_value:string, ... -> connectionID:string
 - (void)op_http_get {
-    CHECK_STACK_DEPTH(1);
+    CHECK_STACK_DEPTH(2);
     
     NSString *url_str = [self pop];
-    
-    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
+    NSInteger n = [[self pop] integerValue];
     
     NSURL *url = [NSURL URLWithString:url_str];
-    NSURLRequest *req = [NSURLRequest requestWithURL:url];
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
     
+    CHECK_STACK_DEPTH(n * 2);
+    for (NSInteger i = 0; i < n; i ++) {
+        NSString *field = [self pop];
+        NSString *value = [self pop];
+        [req addValue:value forHTTPHeaderField:field];
+    }
+    
+    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
     [NSURLConnection connectionWithRequest:req delegate:hndl];
     
     [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
