@@ -78,6 +78,21 @@ function stack_execute (st) {
     }, 100)
 }
 
+JSBridgeStack = function () {
+    this.stack = create_stack ()
+}
+
+JSBridgeStack.prototype.push = function () {
+    for (var i = 0; i < arguments.length; i ++) {
+        stack_push_string (this.stack, arguments[i])
+    }
+    return this
+}
+
+JSBridgeStack.prototype.operate = function (op) {
+    stack_push_operator (this.stack, op)
+    return this
+}
 
 ///////////////////
 
@@ -85,15 +100,10 @@ function init () {
     $(document).ready (function () {
         $("pre").text ("ready")
 
-        var stack = create_stack ()
-        stack_push_string (stack, 123)
-        stack_push_string (stack, 456)
-        stack_push_operator (stack, "add")
-        stack_push_string (stack, "hoge")
-        stack_push_string (stack, 1)
-        stack_push_operator (stack, "callback")
+        var jsb = new JSBridgeStack ()
+        jsb.push (123, 456).operate ("add").push ("hoge", 1).operate ("callback")
 
-        stack_execute (stack)
+        stack_execute (jsb.stack)
     })
 }
 
