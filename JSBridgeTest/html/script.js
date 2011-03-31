@@ -67,7 +67,7 @@ function hoge2 () {
         for (var i = 0; i < url.length; i ++) {
             hex += url.charCodeAt (i).toString (16)
         }
-        location.href = "bridge:///-0/-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
+        location.href = "bridge:///-Value2/-X-Scrw-Ex/-Value1/-X-Scrw-Id/-2/-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
     }, 100)
 }
 
