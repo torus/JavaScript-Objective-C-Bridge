@@ -261,6 +261,30 @@ do {\
     [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 }
 
-//-(void)op_http_post;
+// url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connectionID:string
+- (void)op_http_post {
+    CHECK_STACK_DEPTH(2);
+    
+    NSString *url_str = [self pop];
+    NSInteger n = [[self pop] integerValue];
+    
+    NSURL *url = [NSURL URLWithString:url_str];
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
+    
+    CHECK_STACK_DEPTH(n * 2 + 1);
+    for (NSInteger i = 0; i < n; i ++) {
+        NSString *field = [self pop];
+        NSString *value = [self pop];
+        [req addValue:value forHTTPHeaderField:field];
+    }
+    
+    NSData *body = [self pop];
+    [req setHTTPBody:body];
+    
+    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
+    [NSURLConnection connectionWithRequest:req delegate:hndl];
+    
+    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+}
 
 @end
