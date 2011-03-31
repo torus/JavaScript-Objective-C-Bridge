@@ -112,9 +112,8 @@ function init () {
 function hoge (x) {
     $("pre").append ("\n" + x)
 
-    setTimeout (function () {
-        location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print/-hoge2/-0/@callback"
-    }, 100)
+    var jsb = new JSBridgeStack ()
+    jsb.push (123, 456).operate ("add").push ("hoge", 1).operate ("callback").execute ()
 }
 
 function hoge2 () {
