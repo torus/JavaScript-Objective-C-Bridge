@@ -270,6 +270,7 @@ do {\
     
     NSURL *url = [NSURL URLWithString:url_str];
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
+    [req setHTTPMethod:@"POST"];
     
     CHECK_STACK_DEPTH(n * 2 + 1);
     for (NSInteger i = 0; i < n; i ++) {
@@ -278,6 +279,7 @@ do {\
         [req addValue:value forHTTPHeaderField:field];
     }
     
+    CHECK_STACK_DEPTH(1);
     NSData *body = [self pop];
     [req setHTTPBody:body];
     

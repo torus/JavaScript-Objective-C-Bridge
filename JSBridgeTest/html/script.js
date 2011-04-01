@@ -53,7 +53,7 @@ function stack_push_operator (st, op) {
 function hexify (str) {
     var hex = ""
     for (var i = 0; i < str.length; i ++) {
-        hex += url.charCodeAt (i).toString (16)
+        hex += str.charCodeAt (i).toString (16)
     }
 
     return hex
@@ -67,7 +67,17 @@ function stack_push_string (st, op) {
         stack_push_raw_string (st, op)
     } else {
         stack_push_raw_string (st, hexify (op))
+        stack_push_operator (st, "hexstr")
+        stack_push_operator (st, "str")
     }
+}
+
+function stack_push_data (st, op) {
+    if (typeof (op) != "string")
+        op = op.toString ()
+
+    stack_push_raw_string (st, hexify (op))
+    stack_push_operator (st, "hexstr")
 }
 
 function stack_execute (st) {
@@ -83,8 +93,17 @@ JSBridgeStack = function () {
 }
 
 JSBridgeStack.prototype.push = function () {
+    $("pre").append ("push: " + arguments)
     for (var i = 0; i < arguments.length; i ++) {
         stack_push_string (this.stack, arguments[i])
+    }
+    return this
+}
+
+JSBridgeStack.prototype.pushdata = function () {
+    $("pre").append ("pushdata: " + arguments)
+    for (var i = 0; i < arguments.length; i ++) {
+        stack_push_data (this.stack, arguments[i])
     }
     return this
 }
@@ -114,32 +133,23 @@ function hoge (x) {
 
     var jsb = new JSBridgeStack ()
     jsb.push ("hoge", "key").operate ("hmac_sha1").operate ("base64data").operate ("print").push ("hoge2", 0).operate ("callback").execute ()
-    // setTimeout (function () {
-    //     location.href = "bridge:///-hoge/-key/@hmac_sha1/@base64data/@print/-hoge2/-0/@callback"
-    // }, 100)
 }
 
 function hoge2 () {
     $("pre").append ("\n" + "hoge2")
 
-    setTimeout (function () {
-        var url = "http://scrw.in/"
-        var hex = ""
-        for (var i = 0; i < url.length; i ++) {
-            hex += url.charCodeAt (i).toString (16)
-        }
-        location.href = "bridge:///-Value2%01%02%21%22%23/-X-Scrw-Ex/-Value1/-X-Scrw-Id/-2/-" + hex + "/@hexstr/@str/@http_get/-hoge3/-1/@callback"
-    }, 100)
+    var url = "http://scrw.in/"
+    var jsb = new JSBridgeStack ()
+    jsb.push ("Value1", "X-Scrw-Key1", "Value2", "X-Scrw-Key2", 2, url).operate ("http_post").push ("hoge3", 1).operate ("callback").execute ()
 }
 
 function hoge3 (connid) {
-    $("pre").append ("\n" + "hoge3" + connid)
+    $("pre").append ("\n" + "hoge3: conn ID: " + connid)
 
-    var mesg = '<chat-entry room="opakapaka"><from><user-by-nickname><string>Toru</string></user-by-nickname><avatar-image><string>http://www.gravatar.com/avatar/5efc507a8db7167e2db7889a5597a3cd?s=40&amp;default=identicon</string></avatar-image></from><content><string>abcde</string></content></chat-entry>'
+    var mesg = '<chat-entry room="opakapaka"><from><user-by-nickname><string>Toru</string></user-by-nickname><avatar-image><string>http://www.gravatar.com/avatar/5efc507a8db7167e2db7889a5597a3cd?s=40&amp;default=identicon</string></avatar-image></from><content><string>konichiwa</string></content></chat-entry>'
 
-    setTimeout (function () {
-        location.href = "bridge:///@hexifydata" // causes error
-    }, 100)
+    var jsb = new JSBridgeStack ()
+    jsb.pushdata (mesg).push ("Value1", "X-Scrw-Key1", "Value2", "X-Scrw-Key2", 2, "http://scrw.in/push.cgi").operate ("http_post").operate ("print").execute ()
 }
 
 init ();
