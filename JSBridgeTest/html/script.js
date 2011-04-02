@@ -152,4 +152,73 @@ function hoge3 (connid) {
     jsb.pushdata (mesg).push ("Value1", "X-Scrw-Key1", "Value2", "X-Scrw-Key2", 2, "http://scrw.in/push.cgi").operate ("http_post").operate ("print").execute ()
 }
 
-init ();
+// init ();
+
+function escape_utf8 (str) {
+    // "POST&https%3A%2F%2Fapi.twitter.com%2Foauth%2Frequest_token&oauth_callback%3Dhttp%253A%252F%252Flocalhost%253A3005%252Fthe_dance%252Fprocess_callback%253Fservice_provider_id%253D11%26oauth_consumer_key%3DGDdmIQH6jhtmLUypg82g%26oauth_nonce%3DQP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1272323042%26oauth_version%3D1.0"
+
+    var hex = ""
+    for (var i = 0; i < str.length; i ++) {
+        var c = str.charAt (i)
+        if (c.match (/[a-zA-Z0-9_.-]/)) {
+            hex += c
+        } else {
+            hex += "%" + ("00" + str.charCodeAt (i).toString (16).toUpperCase ()).substr (-2)
+        }
+    }
+
+    return hex
+}
+
+function oauth_make_signature_base (url, method, params) {
+    var params_sorted = []
+    for (var i in params) {
+        params_sorted.push ([i, params[i]])
+    }
+    params_sorted.sort (function (a, b) {return a > b ? 1 : -1})
+
+    console.debug (params_sorted)
+
+    var body = $.map (params_sorted, function (a) {
+        return a[0] + "=" + escape_utf8 (a[1])
+    }).join ("&")
+    var base = $.map ([method, url, body], escape_utf8).join ("&")
+
+    return base
+}
+
+function test_twitter_oauth () {
+    var url = "https://api.twitter.com/oauth/request_token"
+    var method = "POST"
+    var params = {
+        oauth_callback: "http://localhost:3005/the_dance/process_callback?service_provider_id=11",
+        oauth_consumer_key: "GDdmIQH6jhtmLUypg82g",
+        oauth_nonce: "QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk",
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_timestamp: "1272323042",
+        oauth_version: "1.0"
+    }
+
+    var base = oauth_make_signature_base (url, method, params)
+    console.assert (base == "POST&https%3A%2F%2Fapi.twitter.com%2Foauth%2Frequest_token&oauth_callback%3Dhttp%253A%252F%252Flocalhost%253A3005%252Fthe_dance%252Fprocess_callback%253Fservice_provider_id%253D11%26oauth_consumer_key%3DGDdmIQH6jhtmLUypg82g%26oauth_nonce%3DQP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1272323042%26oauth_version%3D1.0")
+}
+
+function twitter_oauth () {
+    var url = "https://api.twitter.com/oauth/request_token"
+    var method = "POST"
+    var params = {
+        oauth_callback: "http://localhost/oauth_callback",
+        oauth_consumer_key: "7IoQbg88rT3GJ01HlTOc9A",
+        oauth_nonce: "hoge" + Date.now (),
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_timestamp: Date.now ().toString (),
+        oauth_version: "1.0"
+    }
+
+    var base = oauth_make_signature_base (url, method, params)
+    console.debug ("base", base)
+}
+
+$(document).ready (function () {
+    test_twitter_oauth ()
+})
