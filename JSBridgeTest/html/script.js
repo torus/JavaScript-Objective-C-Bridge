@@ -187,6 +187,12 @@ function oauth_make_signature_base (url, method, params) {
     return base
 }
 
+CALLBACK = []
+function make_callback (func) {
+    CALLBACK.push (func)
+    return "CALLBACK[" + (CALLBACK.length - 1).toString () + "]"
+}
+
 function test_twitter_oauth () {
     var url = "https://api.twitter.com/oauth/request_token"
     var method = "POST"
@@ -201,6 +207,31 @@ function test_twitter_oauth () {
 
     var base = oauth_make_signature_base (url, method, params)
     console.assert (base == "POST&https%3A%2F%2Fapi.twitter.com%2Foauth%2Frequest_token&oauth_callback%3Dhttp%253A%252F%252Flocalhost%253A3005%252Fthe_dance%252Fprocess_callback%253Fservice_provider_id%253D11%26oauth_consumer_key%3DGDdmIQH6jhtmLUypg82g%26oauth_nonce%3DQP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1272323042%26oauth_version%3D1.0")
+
+    var cb = make_callback (function (sig) {
+        $("pre").append ("\n" + "test_twitter_oauth: signature: " + sig)
+        console.assert (sig == "8wUi7m5HFQy76nowoCThusfgB+Q=")
+
+        var x = []
+        for (var name in params) {
+            var value = params[name]
+            x.push (name + "=\"" + escape_utf8 (value) + "\"")
+        }
+        x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+        var auth = "OAuth " + x.join (", ")
+        $("pre").append ("\n" + "auth: " + auth)
+
+        var jsb = new JSBridgeStack ()
+        jsb.push (auth).operate ("print").execute ()
+
+        // 'OAuth oauth_callback="http%3A%2F%2Flocalhost%3A3005%2Fthe_dance%2Fprocess_callback%3Fservice_provider_id%3D11", oauth_consumer_key="GDdmIQH6jhtmLUypg82g", oauth_nonce="QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1272323042", oauth_version="1.0", oauth_signature="8wUi7m5HFQy76nowoCThusfgB%2BQ%3D"'
+        // 'OAuth oauth_nonce="QP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk", oauth_callback="http%3A%2F%2Flocalhost%3A3005%2Fthe_dance%2Fprocess_callback%3Fservice_provider_id%3D11", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1272323042", oauth_consumer_key="GDdmIQH6jhtmLUypg82g", oauth_signature="8wUi7m5HFQy76nowoCThusfgB%2BQ%3D", oauth_version="1.0"'
+
+    })
+
+    var jsb = new JSBridgeStack ()
+    var key = "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" + "&"
+    jsb.push (base, key).operate ("hmac_sha1").operate ("base64data").push (cb, 1).operate ("callback").execute ()
 }
 
 function twitter_oauth () {
