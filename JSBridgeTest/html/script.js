@@ -194,6 +194,7 @@ function make_callback (func) {
 }
 
 function test_twitter_oauth () {
+    var consumer_secret = "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98"
     var url = "https://api.twitter.com/oauth/request_token"
     var method = "POST"
     var params = {
@@ -230,8 +231,7 @@ function test_twitter_oauth () {
     })
 
     var jsb = new JSBridgeStack ()
-    var key = "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" + "&"
-    jsb.push (base, key).operate ("hmac_sha1").operate ("base64data").push (cb, 1).operate ("callback").execute ()
+    jsb.push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").push (cb, 1).operate ("callback").execute ()
 }
 
 function twitter_oauth () {
