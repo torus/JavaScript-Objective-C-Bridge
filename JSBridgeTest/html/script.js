@@ -8,7 +8,10 @@ function __hex (hexdata) {
     return data
 }
 
+// event must be one of following: fail, recv, response, sent, finish
 function add_connection_handler (connid, event, func) {
+    if (! connectionDelegate[connid])
+        connectionDelegate[connid] = {}
     connectionDelegate[connid][event] = func
 }
 
@@ -268,6 +271,16 @@ function twitter_oauth () {
 
         var cb2 = make_callback (function (connhandle, connid) {
             $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+
+            var res = ""
+
+            add_connection_handler (connid, "recv", function (connid, data) {
+                res += data.toString ()
+            })
+
+            add_connection_handler (connid, "finish", function (connid) {
+                $("pre").append ("\nGot data: " + connid + ": " + res)
+            })
 
             var jsb = new JSBridgeStack ()
             jsb.push (connhandle).operate ("http_send").execute ()
