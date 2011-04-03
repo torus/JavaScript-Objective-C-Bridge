@@ -267,9 +267,10 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     [NSURLConnection connectionWithRequest:req delegate:hndl];
     
     [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+    [self push:[NSString stringWithFormat:@"%d", req]];
 }
 
-// url:string, num_header:number, header_field:string, header_value:string, ... -> connectionID:string
+// url:string, num_header:number, header_field:string, header_value:string, ... -> request_handle:string, connectionID:string
 - (void)op_http_get {
     NSURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail
@@ -279,7 +280,7 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     returnHTTPHandle(self, _cmd, req);
 }
 
-// url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connectionID:string
+// url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> request_handle:string, connectionID:string
 - (void)op_http_post {
     NSMutableURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail

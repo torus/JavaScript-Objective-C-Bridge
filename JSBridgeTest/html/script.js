@@ -266,12 +266,12 @@ function twitter_oauth () {
         var auth = "OAuth " + x.join (", ")
         $("pre").append ("\n" + "auth: " + auth)
 
-        var cb2 = make_callback (function (connid) {
-            $("pre").append ("\n" + url + ": " + connid)
+        var cb2 = make_callback (function (reqhandle, connid) {
+            $("pre").append ("\n" + url + ": " + connid + ": " + reqhandle)
         })
 
         var jsb = new JSBridgeStack ()
-        jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 1).execute ()
+        jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
     })
 
     var jsb = new JSBridgeStack ()
