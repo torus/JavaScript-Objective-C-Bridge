@@ -39,9 +39,21 @@
         [self performSelector:@selector(feedInstructions:) withObject:path afterDelay:0];
         
         return NO;
-    } else {
-        return YES;
+    } else if ([scheme isEqualToString:@"bridge-callback"]) {
+        NSString *func = [url host];// host part indicates function
+        NSString *q = [url query];
+        
+        [[self bridge] push:[q dataUsingEncoding:NSUTF8StringEncoding]];
+        [[self bridge] operate:@"hexifydata"];
+        [[self bridge] push:func];
+        [[self bridge] push:[NSNumber numberWithInt:1]];
+        [[self bridge] operate:@"callback"];
+        
+        return NO;
     }
+    
+    return YES;
+//    return NO;// always returns NO. Create a new UIWebView to show other web pages.
 }
 
 - (void)feedInstructions:(NSArray *)instructions {

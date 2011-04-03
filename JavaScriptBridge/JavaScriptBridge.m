@@ -303,4 +303,37 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     [conn start];
 }
 
+// oauth_token:string, oauth_token_secret:string -> (none)
+- (void)op_store_oauth_token {
+    CHECK_STACK_DEPTH(2);
+    NSString *token = [self pop];
+    NSString *secret = [self pop];
+    
+    NSLog(@"token = %@, secret = %@", token, secret);
+}
+
+// url:string -> handle:string
+- (void)op_open_url_in_new_browser {
+    CHECK_STACK_DEPTH(1);
+    NSString *url = [self pop];
+    
+    UIWebView *newWebView = [[UIWebView alloc] initWithFrame:[[self webView] frame]];
+    [newWebView setDelegate:[[self webView] delegate]];
+    [[self webView] addSubview:newWebView];
+    [newWebView release];
+    
+    [newWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+    [self push:[NSString stringWithFormat:@"%d", newWebView]];
+}
+
+// handle:string -> (none)
+- (void)op_close_browser {
+    CHECK_STACK_DEPTH(1);
+    NSInteger hndl = [[self pop] integerValue];
+    UIWebView *wv = (UIWebView*)hndl;
+    
+    [wv removeFromSuperview];
+    [wv release];
+}
+
 @end
