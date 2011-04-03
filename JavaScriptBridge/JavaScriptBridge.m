@@ -277,11 +277,6 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     }
     
     returnHTTPHandle(self, _cmd, req);
-    
-//    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-//    [NSURLConnection connectionWithRequest:req delegate:hndl];
-//    
-//    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 }
 
 // url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connectionID:string
@@ -297,10 +292,6 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     [req setHTTPMethod:@"POST"];
     
     returnHTTPHandle(self, _cmd, req);
-//    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-//    [NSURLConnection connectionWithRequest:req delegate:hndl];
-//    
-//    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 }
 
 @end
