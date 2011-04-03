@@ -262,21 +262,6 @@ prepareHTTPConnection (JavaScriptBridge* self, SEL _cmd)
 
 // url:string, num_header:number, header_field:string, header_value:string, ... -> connectionID:string
 - (void)op_http_get {
-//    CHECK_STACK_DEPTH(2);
-//    
-//    NSString *url_str = [self pop];
-//    NSInteger n = [[self pop] integerValue];
-//    
-//    NSURL *url = [NSURL URLWithString:url_str];
-//    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
-//    
-//    CHECK_STACK_DEPTH(n * 2);
-//    for (NSInteger i = 0; i < n; i ++) {
-//        NSString *field = [self pop];
-//        NSString *value = [self pop];
-//        [req addValue:value forHTTPHeaderField:field];
-//    }
-    
     NSURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail
         return;
@@ -290,22 +275,6 @@ prepareHTTPConnection (JavaScriptBridge* self, SEL _cmd)
 
 // url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connectionID:string
 - (void)op_http_post {
-//    CHECK_STACK_DEPTH(2);
-//    
-//    NSString *url_str = [self pop];
-//    NSInteger n = [[self pop] integerValue];
-//    
-//    NSURL *url = [NSURL URLWithString:url_str];
-//    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
-//    [req setHTTPMethod:@"POST"];
-//    
-//    CHECK_STACK_DEPTH(n * 2 + 1);
-//    for (NSInteger i = 0; i < n; i ++) {
-//        NSString *field = [self pop];
-//        NSString *value = [self pop];
-//        [req addValue:value forHTTPHeaderField:field];
-//    }
-
     NSMutableURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail
         return;
