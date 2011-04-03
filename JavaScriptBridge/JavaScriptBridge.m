@@ -260,6 +260,15 @@ prepareHTTPConnection (JavaScriptBridge* self, SEL _cmd)
     return req;
 }
 
+static void
+returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
+{
+    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
+    [NSURLConnection connectionWithRequest:req delegate:hndl];
+    
+    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+}
+
 // url:string, num_header:number, header_field:string, header_value:string, ... -> connectionID:string
 - (void)op_http_get {
     NSURLRequest *req = prepareHTTPConnection(self, _cmd);
@@ -267,10 +276,12 @@ prepareHTTPConnection (JavaScriptBridge* self, SEL _cmd)
         return;
     }
     
-    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-    [NSURLConnection connectionWithRequest:req delegate:hndl];
+    returnHTTPHandle(self, _cmd, req);
     
-    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+//    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
+//    [NSURLConnection connectionWithRequest:req delegate:hndl];
+//    
+//    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 }
 
 // url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connectionID:string
@@ -283,11 +294,13 @@ prepareHTTPConnection (JavaScriptBridge* self, SEL _cmd)
     CHECK_STACK_DEPTH(1);
     NSData *body = [self pop];
     [req setHTTPBody:body];
+    [req setHTTPMethod:@"POST"];
     
-    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-    [NSURLConnection connectionWithRequest:req delegate:hndl];
-    
-    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
+    returnHTTPHandle(self, _cmd, req);
+//    JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
+//    [NSURLConnection connectionWithRequest:req delegate:hndl];
+//    
+//    [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
 }
 
 @end
