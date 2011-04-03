@@ -264,13 +264,13 @@ static void
 returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
 {
     JavaScriptBridgeURLConnectionDelegate *hndl = [[JavaScriptBridgeURLConnectionDelegate alloc] initWithWebView:[self webView]];
-    [NSURLConnection connectionWithRequest:req delegate:hndl];
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:req delegate:hndl startImmediately:NO];
     
     [self push:[NSString stringWithFormat:@"%d", [hndl connectionID]]];
-    [self push:[NSString stringWithFormat:@"%d", req]];
+    [self push:[NSString stringWithFormat:@"%d", conn]];
 }
 
-// url:string, num_header:number, header_field:string, header_value:string, ... -> request_handle:string, connectionID:string
+// url:string, num_header:number, header_field:string, header_value:string, ... -> connection_handle:string, connectionID:string
 - (void)op_http_get {
     NSURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail
@@ -280,7 +280,7 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     returnHTTPHandle(self, _cmd, req);
 }
 
-// url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> request_handle:string, connectionID:string
+// url:string, num_header:number, header_field:string, header_value:string, ..., request_body:string -> connection_handle:string, connectionID:string
 - (void)op_http_post {
     NSMutableURLRequest *req = prepareHTTPConnection(self, _cmd);
     if (!req) {// fail
@@ -293,6 +293,14 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     [req setHTTPMethod:@"POST"];
     
     returnHTTPHandle(self, _cmd, req);
+}
+
+// request_handle:string -> (none)
+- (void)op_http_send {
+    CHECK_STACK_DEPTH(1);
+    NSURLConnection *conn = (NSURLConnection*)[[self pop] integerValue];
+
+    [conn start];
 }
 
 @end

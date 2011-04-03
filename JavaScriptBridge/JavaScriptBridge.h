@@ -35,7 +35,8 @@
 
 - (void)op_hmac_sha1;
 - (void)op_http_get;
-//-(void)op_http_post;
+- (void)op_http_post;
+- (void)op_http_send;
 
 @end
 
