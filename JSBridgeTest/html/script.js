@@ -216,9 +216,12 @@ function oauth_make_signature_base (url, method, params) {
 }
 
 CALLBACK = []
+var GLOBAL = this
 function make_callback (func) {
     CALLBACK.push (func)
-    return "CALLBACK[" + (CALLBACK.length - 1).toString () + "]"
+    var name = "CALLBACK_" + (CALLBACK.length - 1).toString ()
+    GLOBAL[name] = func
+    return name
 }
 
 function test_twitter_oauth () {
@@ -241,12 +244,29 @@ function test_twitter_oauth () {
 
 }
 
+function disassemble_response (res) {
+    var dest = {}
+    var arr = res.split ("&")
+    for (var i in arr) {
+        var namevalue = arr[i].split ("=", 2)
+        dest[namevalue[0]] = namevalue[1]
+    }
+
+    return dest
+}
+
 function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var url = "http://api.twitter.com/oauth/request_token"
     var method = "POST"
+    var oauth_cb = make_callback (function (data) {
+        $("pre").append ("\n" + "OAuth callback: " + data)
+
+        var jsb = new JSBridgeStack ()
+        jsb.push ("OAuth callback: " + data).operate ("print").execute ()
+    })
     var params = {
-        oauth_callback: "http://localhost/oauth_callback",
+        oauth_callback: "bridge-callback://" + oauth_cb + "/",
         oauth_consumer_key: "7IoQbg88rT3GJ01HlTOc9A",
         oauth_nonce: "hoge" + Date.now (),
         oauth_signature_method: "HMAC-SHA1",
@@ -280,6 +300,14 @@ function twitter_oauth () {
 
             add_connection_handler (connid, "finish", function (connid) {
                 $("pre").append ("\nGot data: " + connid + ": " + res)
+
+                var data = disassemble_response (res)
+
+                var jsb = new JSBridgeStack ()
+                jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
+                    var jsb = new JSBridgeStack ()
+                    jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").execute ()
+                }), 0).execute ()
             })
 
             var jsb = new JSBridgeStack ()
