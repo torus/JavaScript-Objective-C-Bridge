@@ -257,26 +257,90 @@ function disassemble_response (res) {
 
 function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
-    var url = "http://api.twitter.com/oauth/request_token"
-    var method = "POST"
+    var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
     var browser_handle
+    var oauth_token_secret
     var oauth_cb = make_callback (function (data) {
-        $("pre").append ("\n" + "OAuth callback: " + data)
+        var res = __hex (data)
+        $("pre").append ("\n" + "OAuth callback: " + res)
 
         var jsb = new JSBridgeStack ()
-        jsb.push ("OAuth callback: " + data).operate ("print").
+        jsb.push ("OAuth callback: " + res).operate ("print").
             push (browser_handle).operate ("close_browser").
             execute ()
+
+        var token = disassemble_response (res)
+
+        var params = {
+            oauth_consumer_key: consumer_key,
+            oauth_nonce: "hoge2" + Date.now (),
+            oauth_signature_method: "HMAC-SHA1",
+            oauth_token: token.oauth_token,
+            oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+            oauth_verifier: token.oauth_verifier,
+            oauth_version: "1.0"
+        }
+
+        var url = "https://api.twitter.com/oauth/access_token"
+        var method = "POST"
+        var base = oauth_make_signature_base (url, method, params)
+
+        var jsb = new JSBridgeStack ()
+        jsb.push (base, consumer_secret + "&" + oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
+            var x = []
+            for (var name in params) {
+                var value = params[name]
+                x.push (name + "=\"" + escape_utf8 (value) + "\"")
+            }
+            x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+            var auth = "OAuth " + x.join (", ")
+
+            var cb2 = make_callback (function (connhandle, connid) {
+                $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+
+                var res = ""
+
+                add_connection_handler (connid, "recv", function (connid, data) {
+                    res += data.toString ()
+                })
+
+                add_connection_handler (connid, "finish", function (connid) {
+                    $("pre").append ("\nGot data: " + connid + ": " + res)
+
+                    var data = disassemble_response (res)
+
+                    // oauth_token=819797-Jxq8aYUDRmykzVKrgoLhXSq67TEa5ruc4GJC2rWimw
+                    // oauth_token_secret=J6zix3FfA9LofH0awS24M3HcBYXO5nI1iYe8EfBA
+                    // user_id=819797
+                    // screen_name=episod
+
+                    var jsb = new JSBridgeStack ()
+                    jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
+
+                    
+                })
+
+                var jsb = new JSBridgeStack ()
+                jsb.push (connhandle).operate ("http_send").execute ()
+            })
+
+            var jsb = new JSBridgeStack ()
+            jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+
+        }), 1).execute ()
+
     })
     var params = {
         oauth_callback: "bridge-callback://" + oauth_cb + "/",
-        oauth_consumer_key: "7IoQbg88rT3GJ01HlTOc9A",
+        oauth_consumer_key: consumer_key,
         oauth_nonce: "hoge" + Date.now (),
         oauth_signature_method: "HMAC-SHA1",
         oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
         oauth_version: "1.0"
     }
 
+    var url = "http://api.twitter.com/oauth/request_token"
+    var method = "POST"
     var base = oauth_make_signature_base (url, method, params)
     console.debug ("base", base)
 
@@ -305,6 +369,7 @@ function twitter_oauth () {
                 $("pre").append ("\nGot data: " + connid + ": " + res)
 
                 var data = disassemble_response (res)
+                oauth_token_secret = data.oauth_token_secret
 
                 var jsb = new JSBridgeStack ()
                 jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
