@@ -333,7 +333,6 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     UIWebView *wv = (UIWebView*)hndl;
     
     [wv removeFromSuperview];
-    [wv release];
 }
 
 @end

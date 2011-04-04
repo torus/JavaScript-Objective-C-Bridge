@@ -259,11 +259,14 @@ function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var url = "http://api.twitter.com/oauth/request_token"
     var method = "POST"
+    var browser_handle
     var oauth_cb = make_callback (function (data) {
         $("pre").append ("\n" + "OAuth callback: " + data)
 
         var jsb = new JSBridgeStack ()
-        jsb.push ("OAuth callback: " + data).operate ("print").execute ()
+        jsb.push ("OAuth callback: " + data).operate ("print").
+            push (browser_handle).operate ("close_browser").
+            execute ()
     })
     var params = {
         oauth_callback: "bridge-callback://" + oauth_cb + "/",
@@ -306,7 +309,10 @@ function twitter_oauth () {
                 var jsb = new JSBridgeStack ()
                 jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
                     var jsb = new JSBridgeStack ()
-                    jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").execute ()
+                    jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
+                        pushcallback (make_callback (function (hndl) {
+                            browser_handle = hndl;
+                        }), 1).execute ()
                 }), 0).execute ()
             })
 
