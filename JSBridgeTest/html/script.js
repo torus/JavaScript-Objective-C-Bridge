@@ -266,7 +266,7 @@ function http_post (url, header, body, cont) {
         })
 
         add_connection_handler (connid, "finish", function (connid) {
-            $("pre").append ("\nhttp_post: finish: " + connid + ": " + res)
+            // $("pre").append ("\nhttp_post: finish: " + connid + ": " + res)
 
             if (cont)
                 cont (res)
@@ -284,6 +284,18 @@ function http_post (url, header, body, cont) {
         n ++
     }
     jsb.push (n, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+}
+
+function make_oauth_header (params, sig) {
+    var x = []
+    for (var name in params) {
+        var value = params[name]
+        x.push (name + "=\"" + escape_utf8 (value) + "\"")
+    }
+    x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+    var auth = "OAuth " + x.join (", ")
+
+    return auth
 }
 
 function twitter_oauth () {
@@ -318,13 +330,14 @@ function twitter_oauth () {
 
         var jsb = new JSBridgeStack ()
         jsb.push (base, consumer_secret + "&" + oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-            var x = []
-            for (var name in params) {
-                var value = params[name]
-                x.push (name + "=\"" + escape_utf8 (value) + "\"")
-            }
-            x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
-            var auth = "OAuth " + x.join (", ")
+            // var x = []
+            // for (var name in params) {
+            //     var value = params[name]
+            //     x.push (name + "=\"" + escape_utf8 (value) + "\"")
+            // }
+            // x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+            // var auth = "OAuth " + x.join (", ")
+            var auth = make_oauth_header (params, sig)
 
             http_post (url, {Authorization: auth}, "", function (res) {
                 var data = disassemble_response (res)
@@ -350,13 +363,14 @@ function twitter_oauth () {
 
                 var jsb2 = new JSBridgeStack ()
                 jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-                    var x = []
-                    for (var name in params) {
-                        var value = params[name]
-                        x.push (name + "=\"" + escape_utf8 (value) + "\"")
-                    }
-                    x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
-                    var auth = "OAuth " + x.join (", ")
+                    // var x = []
+                    // for (var name in params) {
+                    //     var value = params[name]
+                    //     x.push (name + "=\"" + escape_utf8 (value) + "\"")
+                    // }
+                    // x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+                    // var auth = "OAuth " + x.join (", ")
+                    var auth = make_oauth_header (params, sig)
 
                     http_post (url, {Authorization: auth}, body, function (res) {
                         var data = eval ("(" + res + ")")
@@ -386,13 +400,14 @@ function twitter_oauth () {
     var cb = make_callback (function (sig) {
         $("pre").append ("\n" + "test_twitter_oauth: signature: " + sig)
 
-        var x = []
-        for (var name in params) {
-            var value = params[name]
-            x.push (name + "=\"" + escape_utf8 (value) + "\"")
-        }
-        x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
-        var auth = "OAuth " + x.join (", ")
+        // var x = []
+        // for (var name in params) {
+        //     var value = params[name]
+        //     x.push (name + "=\"" + escape_utf8 (value) + "\"")
+        // }
+        // x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+        // var auth = "OAuth " + x.join (", ")
+        var auth = make_oauth_header (params, sig)
         $("pre").append ("\n" + "auth: " + auth)
 
         var cb2 = make_callback (function (connhandle, connid) {
