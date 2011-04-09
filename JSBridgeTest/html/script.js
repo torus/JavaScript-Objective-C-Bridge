@@ -326,102 +326,44 @@ function twitter_oauth () {
             x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
             var auth = "OAuth " + x.join (", ")
 
-            // var cb2 = make_callback (function (connhandle, connid) {
-            //     $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
-
-            //     var res = ""
-
-            //     add_connection_handler (connid, "recv", function (connid, data) {
-            //         res += data.toString ()
-            //     })
-
-            //     add_connection_handler (connid, "finish", function (connid) {
-            //         $("pre").append ("\nGot data: " + connid + ": " + res)
-
-            //         var data = disassemble_response (res)
-
-            //         var jsb = new JSBridgeStack ()
-            //         jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
-
-
-            //         var params = {
-            //             oauth_consumer_key: consumer_key,
-            //             oauth_nonce: "hoge3" + Date.now (),
-            //             oauth_signature_method: "HMAC-SHA1",
-            //             oauth_token: data.oauth_token,
-            //             oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
-            //             oauth_version: "1.0"
-            //         }
-
-            //         var url = "http://api.twitter.com/1/statuses/update.json"
-            //         var method = "POST"
-            //         var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
-            //         // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
-            //         var base = oauth_make_signature_base (url, method, params, body)
-
-            //         var jsb2 = new JSBridgeStack ()
-            //         jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-            //             var x = []
-            //             for (var name in params) {
-            //                 var value = params[name]
-            //                 x.push (name + "=\"" + escape_utf8 (value) + "\"")
-            //             }
-            //             x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
-            //             var auth = "OAuth " + x.join (", ")
-
-            //             http_post (url, {Authorization: auth}, body, function (res) {
-            //                 var data = eval ("(" + res + ")")
-            //                 $("pre").append ("\nTweet: " + data.id)
-            //             })
-
-            //         }), 1).execute ()
-            //     })
-
-            //     var jsb = new JSBridgeStack ()
-            //     jsb.push (connhandle).operate ("http_send").execute ()
-            // })
-
-            // var jsb = new JSBridgeStack ()
-            // jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
-
             http_post (url, {Authorization: auth}, "", function (res) {
-                    var data = disassemble_response (res)
+                var data = disassemble_response (res)
 
-                    var jsb = new JSBridgeStack ()
-                    jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
+                var jsb = new JSBridgeStack ()
+                jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
 
 
-                    var params = {
-                        oauth_consumer_key: consumer_key,
-                        oauth_nonce: "hoge3" + Date.now (),
-                        oauth_signature_method: "HMAC-SHA1",
-                        oauth_token: data.oauth_token,
-                        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
-                        oauth_version: "1.0"
+                var params = {
+                    oauth_consumer_key: consumer_key,
+                    oauth_nonce: "hoge3" + Date.now (),
+                    oauth_signature_method: "HMAC-SHA1",
+                    oauth_token: data.oauth_token,
+                    oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+                    oauth_version: "1.0"
+                }
+
+                var url = "http://api.twitter.com/1/statuses/update.json"
+                var method = "POST"
+                var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
+                // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
+                var base = oauth_make_signature_base (url, method, params, body)
+
+                var jsb2 = new JSBridgeStack ()
+                jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
+                    var x = []
+                    for (var name in params) {
+                        var value = params[name]
+                        x.push (name + "=\"" + escape_utf8 (value) + "\"")
                     }
+                    x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+                    var auth = "OAuth " + x.join (", ")
 
-                    var url = "http://api.twitter.com/1/statuses/update.json"
-                    var method = "POST"
-                    var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
-                    // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
-                    var base = oauth_make_signature_base (url, method, params, body)
+                    http_post (url, {Authorization: auth}, body, function (res) {
+                        var data = eval ("(" + res + ")")
+                        $("pre").append ("\nTweet: " + data.id)
+                    })
 
-                    var jsb2 = new JSBridgeStack ()
-                    jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-                        var x = []
-                        for (var name in params) {
-                            var value = params[name]
-                            x.push (name + "=\"" + escape_utf8 (value) + "\"")
-                        }
-                        x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
-                        var auth = "OAuth " + x.join (", ")
-
-                        http_post (url, {Authorization: auth}, body, function (res) {
-                            var data = eval ("(" + res + ")")
-                            $("pre").append ("\nTweet: " + data.id)
-                        })
-
-                    }), 1).execute ()
+                }), 1).execute ()
             })
 
         }), 1).execute ()
