@@ -388,37 +388,51 @@ function twitter_oauth () {
 
         var auth = make_oauth_header (params, sig)
 
-        var cb2 = make_callback (function (connhandle, connid) {
-            $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+        // var cb2 = make_callback (function (connhandle, connid) {
+        //     $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
 
-            var res = ""
+        //     var res = ""
 
-            add_connection_handler (connid, "recv", function (connid, data) {
-                res += data.toString ()
-            })
+        //     add_connection_handler (connid, "recv", function (connid, data) {
+        //         res += data.toString ()
+        //     })
 
-            add_connection_handler (connid, "finish", function (connid) {
-                $("pre").append ("\nGot data: " + connid + ": " + res)
+        //     add_connection_handler (connid, "finish", function (connid) {
+        //         $("pre").append ("\nGot data: " + connid + ": " + res)
 
-                var data = disassemble_response (res)
-                oauth_token_secret = data.oauth_token_secret
+        //         var data = disassemble_response (res)
+        //         oauth_token_secret = data.oauth_token_secret
 
-                var jsb = new JSBridgeStack ()
-                jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
-                    var jsb = new JSBridgeStack ()
-                    jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
-                        pushcallback (make_callback (function (hndl) {
-                            browser_handle = hndl;
-                        }), 1).execute ()
-                }), 0).execute ()
-            })
+        //         var jsb = new JSBridgeStack ()
+        //         jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
+        //             var jsb = new JSBridgeStack ()
+        //             jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
+        //                 pushcallback (make_callback (function (hndl) {
+        //                     browser_handle = hndl;
+        //                 }), 1).execute ()
+        //         }), 0).execute ()
+        //     })
+
+        //     var jsb = new JSBridgeStack ()
+        //     jsb.push (connhandle).operate ("http_send").execute ()
+        // })
+
+        // var jsb = new JSBridgeStack ()
+        // jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+
+        http_post (url, {Authorization: auth}, "", function (res) {
+            var data = disassemble_response (res)
+            oauth_token_secret = data.oauth_token_secret
 
             var jsb = new JSBridgeStack ()
-            jsb.push (connhandle).operate ("http_send").execute ()
+            jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
+                var jsb = new JSBridgeStack ()
+                jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
+                    pushcallback (make_callback (function (hndl) {
+                        browser_handle = hndl;
+                    }), 1).execute ()
+            }), 0).execute ()
         })
-
-        var jsb = new JSBridgeStack ()
-        jsb.push ("", auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
     })
 
     var jsb = new JSBridgeStack ()
