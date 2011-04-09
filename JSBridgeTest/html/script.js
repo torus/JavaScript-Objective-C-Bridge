@@ -376,7 +376,8 @@ function twitter_oauth () {
     var base = oauth_make_signature_base (url, method, params)
     console.debug ("base", base)
 
-    var cb = make_callback (function (sig) {
+    var jsb = new JSBridgeStack ()
+    jsb.push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
         $("pre").append ("\n" + "test_twitter_oauth: signature: " + sig)
 
         var auth = make_oauth_header (params, sig)
@@ -394,10 +395,7 @@ function twitter_oauth () {
                     }), 1).execute ()
             }), 0).execute ()
         })
-    })
-
-    var jsb = new JSBridgeStack ()
-    jsb.push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (cb, 1).execute ()
+    }), 1).execute ()
 }
 
 $(document).ready (function () {
