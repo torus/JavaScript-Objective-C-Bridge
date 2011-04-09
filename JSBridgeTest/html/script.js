@@ -285,8 +285,6 @@ function make_oauth_header (params, sig) {
 }
 
 function tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, text, cont) {
-    // $("pre").append ("\ntweet:\n -" + [consumer_key, oauth_token, oauth_token_secret, text, cont].join ("\n -"))
-
     var params = {
         oauth_consumer_key: consumer_key,
         oauth_nonce: "tweet" + Date.now (),
@@ -296,31 +294,23 @@ function tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, 
         oauth_version: "1.0"
     }
 
-    // $("pre").append ("\ntweet: 1")
-
     var url = "http://api.twitter.com/1/statuses/update.json"
     var method = "POST"
     var body = "status=" + escape_utf8 (text)
     var base = oauth_make_signature_base (url, method, params, body)
 
     var jsb2 = new JSBridgeStack ()
-    // $("pre").append ("\ntweet: 2 " + jsb2)
 
     jsb2.push (base).push(consumer_secret + "&" + oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
         var auth = make_oauth_header (params, sig)
 
-        // $("pre").append ("\ntweet: 3")
-
         http_post (url, {Authorization: auth}, body, function (res) {
-            // $("pre").append ("\ntweet: 4")
             var data = eval ("(" + res + ")")
             if (cont)
                 cont (data)
         })
 
     }), 1).execute ()
-
-    // $("pre").append ("\ntweet: 5 ")
 }
 
 function twitter_oauth () {
@@ -366,31 +356,6 @@ function twitter_oauth () {
                 tweet (consumer_key, consumer_secret, data.oauth_token, data.oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
                     $("pre").append ("\nTweet: " + res.id)
                 })
-
-                // var params = {
-                //     oauth_consumer_key: consumer_key,
-                //     oauth_nonce: "hoge3" + Date.now (),
-                //     oauth_signature_method: "HMAC-SHA1",
-                //     oauth_token: data.oauth_token,
-                //     oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
-                //     oauth_version: "1.0"
-                // }
-
-                // var url = "http://api.twitter.com/1/statuses/update.json"
-                // var method = "POST"
-                // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する" + Date.now ())
-                // var base = oauth_make_signature_base (url, method, params, body)
-
-                // var jsb2 = new JSBridgeStack ()
-                // jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-                //     var auth = make_oauth_header (params, sig)
-
-                //     http_post (url, {Authorization: auth}, body, function (res) {
-                //         var data = eval ("(" + res + ")")
-                //         $("pre").append ("\nTweet: " + data.id)
-                //     })
-
-                // }), 1).execute ()
             })
 
         }), 1).execute ()
