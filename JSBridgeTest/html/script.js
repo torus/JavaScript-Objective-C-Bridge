@@ -185,6 +185,8 @@ function hoge3 (connid) {
 function escape_utf8 (str) {
     // "POST&https%3A%2F%2Fapi.twitter.com%2Foauth%2Frequest_token&oauth_callback%3Dhttp%253A%252F%252Flocalhost%253A3005%252Fthe_dance%252Fprocess_callback%253Fservice_provider_id%253D11%26oauth_consumer_key%3DGDdmIQH6jhtmLUypg82g%26oauth_nonce%3DQP70eNmVz8jvdPevU3oJD2AfF7R7odC2XJcn4XlZJqk%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1272323042%26oauth_version%3D1.0"
 
+    str = unescape (encodeURIComponent (str)) // encode UTF-8 http://ecmanaut.blogspot.com/2006/07/encoding-decoding-utf8-in-javascript.html
+
     var hex = ""
     for (var i = 0; i < str.length; i ++) {
         var c = str.charAt (i)
@@ -198,7 +200,7 @@ function escape_utf8 (str) {
     return hex
 }
 
-function oauth_make_signature_base (url, method, params) {
+function oauth_make_signature_base (url, method, params, request_body) {
     var params_sorted = []
     for (var i in params) {
         params_sorted.push ([i, params[i]])
@@ -210,6 +212,10 @@ function oauth_make_signature_base (url, method, params) {
     var body = $.map (params_sorted, function (a) {
         return a[0] + "=" + escape_utf8 (a[1])
     }).join ("&")
+
+    if (request_body)
+        body += "&" + request_body
+
     var base = $.map ([method, url, body], escape_utf8).join ("&")
 
     return base
@@ -317,7 +323,56 @@ function twitter_oauth () {
                     var jsb = new JSBridgeStack ()
                     jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
 
-                    
+
+                    var params = {
+                        oauth_consumer_key: consumer_key,
+                        oauth_nonce: "hoge3" + Date.now (),
+                        oauth_signature_method: "HMAC-SHA1",
+                        oauth_token: data.oauth_token,
+                        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+                        oauth_version: "1.0"
+                    }
+
+                    var url = "http://api.twitter.com/1/statuses/update.json"
+                    var method = "POST"
+                    var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru")
+                    // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
+                    var base = oauth_make_signature_base (url, method, params, body)
+
+                    var jsb2 = new JSBridgeStack ()
+                    jsb2.push (base, consumer_secret + "&" + data.oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
+                        var x = []
+                        for (var name in params) {
+                            var value = params[name]
+                            x.push (name + "=\"" + escape_utf8 (value) + "\"")
+                        }
+                        x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
+                        var auth = "OAuth " + x.join (", ")
+
+                        var cb2 = make_callback (function (connhandle, connid) {
+                            $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+
+                            var res = ""
+
+                            add_connection_handler (connid, "recv", function (connid, data) {
+                                res += data.toString ()
+                            })
+
+                            add_connection_handler (connid, "finish", function (connid) {
+                                $("pre").append ("\nTweet sent: " + connid + ": " + res)
+
+                                var data = disassemble_response (res)
+
+                            })
+
+                            var jsb = new JSBridgeStack ()
+                            jsb.push (connhandle).operate ("http_send").execute ()
+                        })
+
+                        var jsb = new JSBridgeStack ()
+                        jsb.pushdata (body).push (auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+
+                    }), 1).execute ()
                 })
 
                 var jsb = new JSBridgeStack ()
