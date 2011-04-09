@@ -313,6 +313,19 @@ function tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, 
     }), 1).execute ()
 }
 
+function request_token_params (consumer_key, oauth_cb) {
+    var params = {
+        oauth_callback: "bridge-callback://" + oauth_cb + "/",
+        oauth_consumer_key: consumer_key,
+        oauth_nonce: "hoge" + Date.now (),
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+        oauth_version: "1.0"
+    }
+
+    return params
+}
+
 function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
@@ -362,19 +375,10 @@ function twitter_oauth () {
 
     })
 
-    var params = {
-        oauth_callback: "bridge-callback://" + oauth_cb + "/",
-        oauth_consumer_key: consumer_key,
-        oauth_nonce: "hoge" + Date.now (),
-        oauth_signature_method: "HMAC-SHA1",
-        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
-        oauth_version: "1.0"
-    }
-
+    var params = request_token_params (consumer_key, oauth_cb)
     var url = "http://api.twitter.com/oauth/request_token"
     var method = "POST"
     var base = oauth_make_signature_base (url, method, params)
-    console.debug ("base", base)
 
     var jsb = new JSBridgeStack ()
     jsb.push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
