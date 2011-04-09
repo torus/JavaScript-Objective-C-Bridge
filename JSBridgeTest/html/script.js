@@ -106,7 +106,7 @@ function stack_push_data (st, op) {
 
 function stack_execute (st) {
     var uri = "bridge:///" + st.join ("/")
-    $("pre").append ("\nexecute: " + uri)
+    // $("pre").append ("\nexecute: " + uri)
     setTimeout (function () {
         location.href = uri
     }, 100)
@@ -117,7 +117,7 @@ JSBridgeStack = function () {
 }
 
 JSBridgeStack.prototype.push = function () {
-    $("pre").append ("push: " + arguments)
+    // $("pre").append ("push: " + arguments)
     for (var i = 0; i < arguments.length; i ++) {
         stack_push_string (this.stack, arguments[i])
     }
@@ -125,7 +125,7 @@ JSBridgeStack.prototype.push = function () {
 }
 
 JSBridgeStack.prototype.pushdata = function () {
-    $("pre").append ("pushdata: " + arguments)
+    // $("pre").append ("pushdata: " + arguments)
     for (var i = 0; i < arguments.length; i ++) {
         stack_push_data (this.stack, arguments[i])
     }
@@ -261,6 +261,38 @@ function disassemble_response (res) {
     return dest
 }
 
+function http_post (url, header, body, cont) {
+    var cb2 = make_callback (function (connhandle, connid) {
+        // $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+
+        var res = ""
+
+        add_connection_handler (connid, "recv", function (connid, data) {
+            res += data.toString ()
+        })
+
+        add_connection_handler (connid, "finish", function (connid) {
+            $("pre").append ("\nhttp_post: finish: " + connid + ": " + res)
+
+            if (cont)
+                cont (res)
+            // var data = disassemble_response (res)
+        })
+
+        var jsb = new JSBridgeStack ()
+        jsb.push (connhandle).operate ("http_send").execute ()
+    })
+
+    var jsb = new JSBridgeStack ()
+    jsb.pushdata (body)
+    var n = 0
+    for (var f in header) {
+        jsb.push (header[f], f)
+        n ++
+    }
+    jsb.push (n, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+}
+
 function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
@@ -335,7 +367,7 @@ function twitter_oauth () {
 
                     var url = "http://api.twitter.com/1/statuses/update.json"
                     var method = "POST"
-                    var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru")
+                    var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
                     // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
                     var base = oauth_make_signature_base (url, method, params, body)
 
@@ -349,28 +381,33 @@ function twitter_oauth () {
                         x.push ("oauth_signature" + "=\"" + escape_utf8 (sig) + "\"")
                         var auth = "OAuth " + x.join (", ")
 
-                        var cb2 = make_callback (function (connhandle, connid) {
-                            $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
+                        // var cb2 = make_callback (function (connhandle, connid) {
+                        //     $("pre").append ("\n" + url + ": " + connid + ": " + connhandle)
 
-                            var res = ""
+                        //     var res = ""
 
-                            add_connection_handler (connid, "recv", function (connid, data) {
-                                res += data.toString ()
-                            })
+                        //     add_connection_handler (connid, "recv", function (connid, data) {
+                        //         res += data.toString ()
+                        //     })
 
-                            add_connection_handler (connid, "finish", function (connid) {
-                                $("pre").append ("\nTweet sent: " + connid + ": " + res)
+                        //     add_connection_handler (connid, "finish", function (connid) {
+                        //         $("pre").append ("\nTweet sent: " + connid + ": " + res)
 
-                                var data = disassemble_response (res)
+                        //         var data = disassemble_response (res)
 
-                            })
+                        //     })
 
-                            var jsb = new JSBridgeStack ()
-                            jsb.push (connhandle).operate ("http_send").execute ()
+                        //     var jsb = new JSBridgeStack ()
+                        //     jsb.push (connhandle).operate ("http_send").execute ()
+                        // })
+
+                        // var jsb = new JSBridgeStack ()
+                        // jsb.pushdata (body).push (auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
+
+                        http_post (url, {Authorization: auth}, body, function (res) {
+                            var data = eval ("(" + res + ")")
+                            $("pre").append ("\nTweet: " + data.id)
                         })
-
-                        var jsb = new JSBridgeStack ()
-                        jsb.pushdata (body).push (auth, "Authorization", 1, url).operate ("http_post").pushcallback (cb2, 2).execute ()
 
                     }), 1).execute ()
                 })
