@@ -181,19 +181,21 @@ function hoge3 (connid) {
 // init ();
 
 function escape_utf8 (str) {
-    str = unescape (encodeURIComponent (str)) // encode UTF-8 http://ecmanaut.blogspot.com/2006/07/encoding-decoding-utf8-in-javascript.html
+    // str = unescape (encodeURIComponent (str)) // encode UTF-8 http://ecmanaut.blogspot.com/2006/07/encoding-decoding-utf8-in-javascript.html
 
-    var hex = ""
-    for (var i = 0; i < str.length; i ++) {
-        var c = str.charAt (i)
-        if (c.match (/[a-zA-Z0-9_.-]/)) {
-            hex += c
-        } else {
-            hex += "%" + ("00" + str.charCodeAt (i).toString (16).toUpperCase ()).substr (-2)
-        }
-    }
+    // var hex = ""
+    // for (var i = 0; i < str.length; i ++) {
+    //     var c = str.charAt (i)
+    //     if (c.match (/[a-zA-Z0-9_.-]/)) {
+    //         hex += c
+    //     } else {
+    //         hex += "%" + ("00" + str.charCodeAt (i).toString (16).toUpperCase ()).substr (-2)
+    //     }
+    // }
 
-    return hex
+    // return hex
+
+    return encodeURIComponent (str)
 }
 
 function oauth_make_signature_base (url, method, params, request_body) {
@@ -338,7 +340,6 @@ function twitter_oauth () {
                 var jsb = new JSBridgeStack ()
                 jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
 
-
                 var params = {
                     oauth_consumer_key: consumer_key,
                     oauth_nonce: "hoge3" + Date.now (),
@@ -350,8 +351,9 @@ function twitter_oauth () {
 
                 var url = "http://api.twitter.com/1/statuses/update.json"
                 var method = "POST"
-                var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
-                // var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する")
+                // var body = "status=" + escape_utf8 ("setting up my twitter Watashi No Saezuri Wo Settei Suru: " + Date.now ())
+                var body = "status=" + escape_utf8 ("setting up my twitter 私のさえずりを設定する" + Date.now ())
+                $("pre").append ("\nBody: " + body)
                 var base = oauth_make_signature_base (url, method, params, body)
 
                 var jsb2 = new JSBridgeStack ()
@@ -369,6 +371,7 @@ function twitter_oauth () {
         }), 1).execute ()
 
     })
+
     var params = {
         oauth_callback: "bridge-callback://" + oauth_cb + "/",
         oauth_consumer_key: consumer_key,
