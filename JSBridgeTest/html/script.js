@@ -326,6 +326,20 @@ function request_token_params (consumer_key, oauth_cb) {
     return params
 }
 
+function access_token_params (consumer_key, oauth_token, oauth_verifier) {
+    var params = {
+        oauth_consumer_key: consumer_key,
+        oauth_nonce: "hoge2" + Date.now (),
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_token: oauth_token,
+        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+        oauth_verifier: oauth_verifier,
+        oauth_version: "1.0"
+    }
+
+    return params
+}
+
 function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
@@ -342,15 +356,7 @@ function twitter_oauth () {
 
         var token = disassemble_response (res)
 
-        var params = {
-            oauth_consumer_key: consumer_key,
-            oauth_nonce: "hoge2" + Date.now (),
-            oauth_signature_method: "HMAC-SHA1",
-            oauth_token: token.oauth_token,
-            oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
-            oauth_verifier: token.oauth_verifier,
-            oauth_version: "1.0"
-        }
+        var params = access_token_params (consumer_key, token.oauth_token, token.oauth_verifier)
 
         var url = "https://api.twitter.com/oauth/access_token"
         var method = "POST"
