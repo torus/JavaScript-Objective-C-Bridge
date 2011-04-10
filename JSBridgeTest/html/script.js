@@ -314,7 +314,7 @@ function tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, 
     }), 1).execute ()
 }
 
-function request_token_params (consumer_key, oauth_cb) {
+function oauth_request_token_params (consumer_key, oauth_cb) {
     var params = {
         oauth_callback: "bridge-callback://" + oauth_cb + "/",
         oauth_consumer_key: consumer_key,
@@ -327,7 +327,7 @@ function request_token_params (consumer_key, oauth_cb) {
     return params
 }
 
-function access_token_params (consumer_key, oauth_token, oauth_verifier) {
+function oauth_access_token_params (consumer_key, oauth_token, oauth_verifier) {
     var params = {
         oauth_consumer_key: consumer_key,
         oauth_nonce: "hoge2" + Date.now (),
@@ -341,8 +341,8 @@ function access_token_params (consumer_key, oauth_token, oauth_verifier) {
     return params
 }
 
-function access_token (consumer_key, consumer_secret, oauth_token_secret, oauth_token, oauth_verifier, cont) {
-    var params = access_token_params (consumer_key, oauth_token, oauth_verifier)
+function oauth_access_token (consumer_key, consumer_secret, oauth_token_secret, oauth_token, oauth_verifier, cont) {
+    var params = oauth_access_token_params (consumer_key, oauth_token, oauth_verifier)
 
     var url = "https://api.twitter.com/oauth/access_token"
     var method = "POST"
@@ -363,10 +363,10 @@ function access_token (consumer_key, consumer_secret, oauth_token_secret, oauth_
     }), 1).execute ()
 }
 
-function request_token (consumer_key, consumer_secret, cont) {
+function oauth_request_token (consumer_key, consumer_secret, cont) {
     var stat = {}
 
-    var params = request_token_params (consumer_key, cont (stat))
+    var params = oauth_request_token_params (consumer_key, cont (stat))
     var url = "http://api.twitter.com/oauth/request_token"
     var method = "POST"
     var base = oauth_make_signature_base (url, method, params)
@@ -397,7 +397,7 @@ function twitter_oauth () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
 
-    request_token (consumer_key, consumer_secret, function (stat) {
+    oauth_request_token (consumer_key, consumer_secret, function (stat) {
         return make_callback (function (data) {
             var browser_handle = stat.browser_handle
             var oauth_token_secret = stat.browser_handle
@@ -412,7 +412,7 @@ function twitter_oauth () {
 
             var token = disassemble_response (res)
 
-            access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, function (oauth_token, oauth_token_secret) {
+            oauth_access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, function (oauth_token, oauth_token_secret) {
                 var jsb = new JSBridgeStack ()
                 jsb.push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
 
