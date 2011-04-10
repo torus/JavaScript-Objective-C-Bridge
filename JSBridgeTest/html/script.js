@@ -351,10 +351,7 @@ function oauth_request_token (consumer_key, consumer_secret, cont) {
     }), 1).execute ()
 }
 
-function twitter_oauth () {
-    var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
-    var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
-
+function twitter_oauth (consumer_key, consumer_secret, cont) {
     oauth_request_token (consumer_key, consumer_secret, function (stat) {
         return make_callback (function (data) {
             var browser_handle = stat.browser_handle
@@ -369,20 +366,22 @@ function twitter_oauth () {
 
             var token = disassemble_response (res)
 
-            oauth_access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, function (oauth_token, oauth_token_secret) {
-                new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
-
-                tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-                    $("pre").append ("\nTweet: " + res.id + " " + res)
-                })
-            })
+            oauth_access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, cont)
         })
     })
 }
 
 $(document).ready (function () {
+    var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
+    var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
+
     try {
-        twitter_oauth ()
+        twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
+            new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
+            tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
+                $("pre").append ("\nTweet: " + res.id + " " + res)
+            })
+        })
     } catch (err) {
         alert (err)
     }
