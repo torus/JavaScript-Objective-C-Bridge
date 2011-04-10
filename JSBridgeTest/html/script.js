@@ -363,33 +363,10 @@ function access_token (consumer_key, consumer_secret, oauth_token_secret, oauth_
     }), 1).execute ()
 }
 
-function twitter_oauth () {
-    var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
-    var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
-    var browser_handle
-    var oauth_token_secret
-    var oauth_cb = make_callback (function (data) {
-        var res = __hex (data)
-        $("pre").append ("\n" + "OAuth callback: " + res)
+function request_token (consumer_key, consumer_secret, cont) {
+    var stat = {}
 
-        var jsb = new JSBridgeStack ()
-        jsb.push ("OAuth callback: " + res).operate ("print").
-            push (browser_handle).operate ("close_browser").
-            execute ()
-
-        var token = disassemble_response (res)
-
-        access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, function (oauth_token, oauth_token_secret) {
-            var jsb = new JSBridgeStack ()
-            jsb.push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
-
-            tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-                $("pre").append ("\nTweet: " + res.id + " " + res)
-            })
-        })
-    })
-
-    var params = request_token_params (consumer_key, oauth_cb)
+    var params = request_token_params (consumer_key, cont (stat))
     var url = "http://api.twitter.com/oauth/request_token"
     var method = "POST"
     var base = oauth_make_signature_base (url, method, params)
@@ -402,18 +379,78 @@ function twitter_oauth () {
 
         http_post (url, {Authorization: auth}, "", function (res) {
             var data = disassemble_response (res)
-            oauth_token_secret = data.oauth_token_secret
+            stat.oauth_token_secret = data.oauth_token_secret
 
             var jsb = new JSBridgeStack ()
             jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
                 var jsb = new JSBridgeStack ()
                 jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
                     pushcallback (make_callback (function (hndl) {
-                        browser_handle = hndl;
+                        stat.browser_handle = hndl;
                     }), 1).execute ()
             }), 0).execute ()
         })
     }), 1).execute ()
+}
+
+function twitter_oauth () {
+    var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
+    var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
+    // var browser_handle
+    // var oauth_token_secret
+    var oauth_cb = function (stat) {
+        return make_callback (function (data) {
+            var browser_handle = stat.browser_handle
+            var oauth_token_secret = stat.browser_handle
+
+            var res = __hex (data)
+            $("pre").append ("\n" + "OAuth callback: " + res)
+
+            var jsb = new JSBridgeStack ()
+            jsb.push ("OAuth callback: " + res).operate ("print").
+                push (browser_handle).operate ("close_browser").
+                execute ()
+
+            var token = disassemble_response (res)
+
+            access_token (consumer_key, consumer_secret, oauth_token_secret, token.oauth_token, token.oauth_verifier, function (oauth_token, oauth_token_secret) {
+                var jsb = new JSBridgeStack ()
+                jsb.push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
+
+                tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
+                    $("pre").append ("\nTweet: " + res.id + " " + res)
+                })
+            })
+        })
+    }
+
+    request_token (consumer_key, consumer_secret, oauth_cb)
+
+    // var params = request_token_params (consumer_key, oauth_cb)
+    // var url = "http://api.twitter.com/oauth/request_token"
+    // var method = "POST"
+    // var base = oauth_make_signature_base (url, method, params)
+
+    // var jsb = new JSBridgeStack ()
+    // jsb.push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
+    //     $("pre").append ("\n" + "test_twitter_oauth: signature: " + sig)
+
+    //     var auth = make_oauth_header (params, sig)
+
+    //     http_post (url, {Authorization: auth}, "", function (res) {
+    //         var data = disassemble_response (res)
+    //         oauth_token_secret = data.oauth_token_secret
+
+    //         var jsb = new JSBridgeStack ()
+    //         jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
+    //             var jsb = new JSBridgeStack ()
+    //             jsb.push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
+    //                 pushcallback (make_callback (function (hndl) {
+    //                     browser_handle = hndl;
+    //                 }), 1).execute ()
+    //         }), 0).execute ()
+    //     })
+    // }), 1).execute ()
 }
 
 $(document).ready (function () {
