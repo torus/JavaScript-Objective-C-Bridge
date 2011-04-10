@@ -355,12 +355,6 @@ function access_token (consumer_key, consumer_secret, oauth_token_secret, oauth_
         http_post (url, {Authorization: auth}, "", function (res) {
             var data = disassemble_response (res)
 
-            // var jsb = new JSBridgeStack ()
-            // jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
-
-            // tweet (consumer_key, consumer_secret, data.oauth_token, data.oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-            //     $("pre").append ("\nTweet: " + res.id)
-            // })
             if (cont) {
                 cont (data.oauth_token, data.oauth_token_secret)
             }
@@ -393,29 +387,6 @@ function twitter_oauth () {
                 $("pre").append ("\nTweet: " + res.id + " " + res)
             })
         })
-        // var params = access_token_params (consumer_key, token.oauth_token, token.oauth_verifier)
-
-        // var url = "https://api.twitter.com/oauth/access_token"
-        // var method = "POST"
-        // var base = oauth_make_signature_base (url, method, params)
-
-        // var jsb = new JSBridgeStack ()
-        // jsb.push (base, consumer_secret + "&" + oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-        //     var auth = make_oauth_header (params, sig)
-
-        //     http_post (url, {Authorization: auth}, "", function (res) {
-        //         var data = disassemble_response (res)
-
-        //         var jsb = new JSBridgeStack ()
-        //         jsb.push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").execute ()
-
-        //         tweet (consumer_key, consumer_secret, data.oauth_token, data.oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-        //             $("pre").append ("\nTweet: " + res.id)
-        //         })
-        //     })
-
-        // }), 1).execute ()
-
     })
 
     var params = request_token_params (consumer_key, oauth_cb)
