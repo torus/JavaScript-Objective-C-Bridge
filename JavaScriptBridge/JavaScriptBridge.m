@@ -161,7 +161,9 @@ do {\
     
     for (int i = 0; i < n; i ++) {
         NSString *arg = [self pop];
-        
+        if (!arg) {
+            arg = @"";
+        }
             // arg must be a *safe* string, which doesn't contain any control charactor nor ", \, etc...
         [args addObject:arg];
     }
@@ -304,12 +306,26 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
 }
 
 // oauth_token:string, oauth_token_secret:string -> (none)
-- (void)op_store_oauth_token {
+- (void)op_store_twitter_credential {
     CHECK_STACK_DEPTH(2);
     NSString *token = [self pop];
     NSString *secret = [self pop];
     
     NSLog(@"token = %@, secret = %@", token, secret);
+    
+    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+    [def setValue:token forKey:@"oauth_token"];
+    [def setValue:secret forKey:@"oauth_token_secret"];
+}
+
+// (none) -> oauth_token:string, oauth_token_secret:string
+- (void)op_twitter_credential {
+    NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
+    NSString *token = [def stringForKey:@"oauth_token"];
+    NSString *secret = [def stringForKey:@"oauth_token_secret"];
+    
+    [self push:secret];
+    [self push:token];
 }
 
 // url:string -> handle:string

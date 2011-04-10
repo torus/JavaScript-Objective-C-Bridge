@@ -37,8 +37,10 @@
 - (void)op_http_get;
 - (void)op_http_post;
 - (void)op_http_send;
-- (void)op_store_oauth_token;
+- (void)op_store_twitter_credential;
+- (void)op_twitter_credential;
 - (void)op_open_url_in_new_browser;
+- (void)op_close_browser;
 - (void)op_close_browser;
 
 @end

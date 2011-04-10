@@ -341,12 +341,12 @@ function oauth_request_token (consumer_key, consumer_secret, cont) {
             var data = disassemble_response (res)
             stat.oauth_token_secret = data.oauth_token_secret
 
-            new JSBridgeStack ().push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
+            // new JSBridgeStack ().push (data.oauth_token_secret, data.oauth_token).operate ("store_oauth_token").pushcallback (make_callback (function () {
                 new JSBridgeStack ().push ("http://api.twitter.com/oauth/authorize?oauth_token=" + data.oauth_token).operate ("open_url_in_new_browser").
                     pushcallback (make_callback (function (hndl) {
                         stat.browser_handle = hndl;
                     }), 1).execute ()
-            }), 0).execute ()
+            // }), 0).execute ()
         })
     }), 1).execute ()
 }
@@ -376,12 +376,20 @@ $(document).ready (function () {
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
 
     try {
-        twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
-            new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_oauth_token").execute ()
-            tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-                $("pre").append ("\nTweet: " + res.id + " " + res)
-            })
-        })
+        new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
+            if (oauth_token.length > 0 && oauth_token_secret.length > 0) {
+                tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
+                    $("pre").append ("\nTweet: " + res.id + " " + res)
+                })
+            } else {
+                twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
+                    new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_twitter_credential").execute ()
+                    tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
+                        $("pre").append ("\nTweet: " + res.id + " " + res)
+                    })
+                })
+            }
+        }), 2).execute ()
     } catch (err) {
         alert (err)
     }
