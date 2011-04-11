@@ -175,7 +175,13 @@ var GLOBAL = this
 function make_callback (func) {
     CALLBACK.push (func)
     var name = "CALLBACK_" + (CALLBACK.length - 1).toString ()
-    GLOBAL[name] = func
+    GLOBAL[name] = function () {
+        try {
+            func.apply (this, arguments)
+        } catch (err) {
+            alert (err)
+        }
+    }
     return name
 }
 
@@ -208,6 +214,31 @@ function disassemble_response (res) {
     }
 
     return dest
+}
+
+function http_get (url, header, cont) {
+    var cb2 = make_callback (function (connhandle, connid) {
+        var res = ""
+
+        add_connection_handler (connid, "recv", function (connid, data) {
+            res += data.toString ()
+        })
+
+        add_connection_handler (connid, "finish", function (connid) {
+            if (cont)
+                cont (res)
+        })
+
+        new JSBridgeStack ().push (connhandle).operate ("http_send").execute ()
+    })
+
+    var jsb = new JSBridgeStack ()
+    var n = 0
+    for (var f in header) {
+        jsb.push (header[f], f)
+        n ++
+    }
+    jsb.push (n, url).operate ("http_get").pushcallback (cb2, 2).execute ()
 }
 
 function http_post (url, header, body, cont) {
@@ -333,7 +364,7 @@ function oauth_request_token (consumer_key, consumer_secret, cont) {
     var base = oauth_make_signature_base (url, method, params)
 
     new JSBridgeStack ().push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-        $("pre").append ("\n" + "test_twitter_oauth: signature: " + sig)
+        $("pre").append ("\n" + "oauth_request_token: signature: " + sig)
 
         var auth = make_oauth_header (params, sig)
 
@@ -371,15 +402,48 @@ function twitter_oauth (consumer_key, consumer_secret, cont) {
     })
 }
 
+function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, cont) {
+    $("pre").append ("\nhome_timeline: \n -" + [consumer_key, consumer_secret, oauth_token, oauth_token_secret, cont].join ("\n -"))
+
+    var params = {
+        oauth_consumer_key: consumer_key,
+        oauth_nonce: "timeline" + Date.now (),
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_token: oauth_token,
+        oauth_timestamp: Math.floor (Date.now () / 1000).toString (),
+        oauth_version: "1.0"
+    }
+
+    var url = "http://api.twitter.com/1/statuses/home_timeline.json"
+    var method = "GET"
+    var base = oauth_make_signature_base (url, method, params)
+
+    new JSBridgeStack ().push (base).push(consumer_secret + "&" + oauth_token_secret).operate ("hmac_sha1").operate ("base64data").pushcallback (
+        make_callback (function (sig) {
+            var auth = make_oauth_header (params, sig)
+
+            http_get (url, {Authorization: auth}, function (res) {
+                var data = eval ("(" + res + ")")
+
+                if (cont)
+                    cont (data)
+            })
+        }), 1).execute ()
+}
+
 $(document).ready (function () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
 
     try {
         new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
-            if (oauth_token.length > 0 && oauth_token_secret.length > 0) {
-                tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-                    $("pre").append ("\nTweet: " + res.id + " " + res)
+            if (oauth_token && oauth_token.length > 0 && oauth_token_secret && oauth_token_secret.length > 0) {
+                // tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "てすと。 " + Date.now (), function (res) {
+                //     $("pre").append ("\nTweet: " + res.id + " " + res)
+                // })
+
+                home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, function (data) {
+                    new JSBridgeStack ().push (data.toString ()).operate ("print").execute ()
                 })
             } else {
                 twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
