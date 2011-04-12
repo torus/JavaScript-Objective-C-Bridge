@@ -12,10 +12,12 @@
 @interface JavaScriptBridge : NSObject {
 	NSMutableArray *stack;
     UIWebView *webView;
+    UIViewController *viewController;
 }
 
 @property(nonatomic, retain) NSMutableArray *stack;
 @property(nonatomic, retain) UIWebView *webView;
+@property(nonatomic, retain) UIViewController *viewController;
 
 - (void)push:(id)operand;
 - (id)pop;
@@ -42,6 +44,9 @@
 - (void)op_open_url_in_new_browser;
 - (void)op_close_browser;
 - (void)op_close_browser;
+
+- (void)op_create_instance;
+
 
 @end
 

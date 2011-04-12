@@ -32,6 +32,7 @@
     [recv release];
     
     [[recv bridge] setWebView:wv];
+    [[recv bridge] setViewController:self];
 
     [wv loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"index" ofType:@"html"]]]];
 }

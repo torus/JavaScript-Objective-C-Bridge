@@ -15,7 +15,7 @@
 
 @implementation JavaScriptBridge
 
-@synthesize stack, webView;
+@synthesize stack, webView, viewController;
 
 - (id)init {
 	[super init];
@@ -349,6 +349,63 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     UIWebView *wv = (UIWebView*)hndl;
     
     [wv removeFromSuperview];
+}
+
+
+#pragma mark View Controller
+
+// class:string -> handle:string
+- (void)op_create_instance {
+    CHECK_STACK_DEPTH(1);
+    
+    Class cls = (Class)[self pop];
+    
+    if (cls) {
+        id x = class_createInstance(cls, 0);
+        [self push:[NSString stringWithFormat:@"%d", (unsigned int)x]];
+    } else {
+        [self push:@""];
+    }
+}
+
+// class_name:string -> class:string
+- (void)op_look_up_class {
+    CHECK_STACK_DEPTH(1);
+    NSString *clsname = [self pop];
+    Class cls = objc_lookUpClass([clsname cStringUsingEncoding:NSUTF8StringEncoding]);
+    
+    [self push:cls];
+}
+
+// handle:string, selector:string, numargs:integer, arg:id, ... -> (none)
+- (void)op_send_mesg {
+    CHECK_STACK_DEPTH(2);
+    id obj = (id)[[self pop] integerValue];
+    SEL mesg = (SEL)[[self pop] integerValue];
+    int n = [[self pop] integerValue];
+
+    CHECK_STACK_DEPTH(n);
+
+    switch (n) {
+        case 0:
+            objc_msgSend(obj, mesg);
+            break;
+            
+        case 1:
+            objc_msgSend(obj, mesg, [self pop]);
+            break;
+            
+        case 2:
+            objc_msgSend(obj, mesg, [self pop], [self pop]);
+            break;
+            
+        case 3:
+            objc_msgSend(obj, mesg, [self pop], [self pop], [self pop]);
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end

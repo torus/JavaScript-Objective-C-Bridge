@@ -431,11 +431,28 @@ function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_
         }), 1).execute ()
 }
 
+//////////////////////
+
+function test_objc () {
+    new JSBridgeStack ().
+        push ("UITableViewController").operate ("look_up_class").operate ("create_instance").
+        // push ("").operate ("view_controller").operate ("navigation_controller")
+        // operate ("send_mesg")
+        pushcallback (make_callback (function (hndl) {
+            $("pre").append ("\ntable view controller: " + hndl)
+        }), 1).execute ()
+}
+
+//////////////////////
+
 $(document).ready (function () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
 
     try {
+        test_objc ()
+        throw ("done")
+
         new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
             if (oauth_token && oauth_token.length > 0 && oauth_token_secret && oauth_token_secret.length > 0) {
                 // tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "てすと。 " + Date.now (), function (res) {
