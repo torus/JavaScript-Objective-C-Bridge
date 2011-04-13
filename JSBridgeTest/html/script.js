@@ -436,7 +436,8 @@ function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_
 function test_objc () {
     new JSBridgeStack ().
         push ("UITableViewController").operate ("look_up_class").operate ("create_instance").
-        // push ("").operate ("view_controller").operate ("navigation_controller")
+        operate ("xxx_pushtable").
+        // operate ("self")
         // operate ("send_mesg")
         pushcallback (make_callback (function (hndl) {
             $("pre").append ("\ntable view controller: " + hndl)
@@ -451,26 +452,26 @@ $(document).ready (function () {
 
     try {
         test_objc ()
-        throw ("done")
+        // throw ("done")
 
-        new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
-            if (oauth_token && oauth_token.length > 0 && oauth_token_secret && oauth_token_secret.length > 0) {
-                // tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "てすと。 " + Date.now (), function (res) {
-                //     $("pre").append ("\nTweet: " + res.id + " " + res)
-                // })
+        // new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
+        //     if (oauth_token && oauth_token.length > 0 && oauth_token_secret && oauth_token_secret.length > 0) {
+        //         // tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "てすと。 " + Date.now (), function (res) {
+        //         //     $("pre").append ("\nTweet: " + res.id + " " + res)
+        //         // })
 
-                home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, function (data) {
-                    new JSBridgeStack ().push (data.toString ()).operate ("print").execute ()
-                })
-            } else {
-                twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
-                    new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_twitter_credential").execute ()
-                    tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
-                        $("pre").append ("\nTweet: " + res.id + " " + res)
-                    })
-                })
-            }
-        }), 2).execute ()
+        //         home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, function (data) {
+        //             new JSBridgeStack ().push (data.toString ()).operate ("print").execute ()
+        //         })
+        //     } else {
+        //         twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
+        //             new JSBridgeStack ().push (oauth_token_secret, oauth_token).operate ("store_twitter_credential").execute ()
+        //             tweet (consumer_key, consumer_secret, oauth_token, oauth_token_secret, "setting up my twitter 私のさえずりを設定する " + Date.now (), function (res) {
+        //                 $("pre").append ("\nTweet: " + res.id + " " + res)
+        //             })
+        //         })
+        //     }
+        // }), 2).execute ()
     } catch (err) {
         alert (err)
     }

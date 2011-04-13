@@ -354,6 +354,11 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
 
 #pragma mark View Controller
 
+// (none) -> nav_controller:id
+- (void)navigation_controller {
+    [self push:[[self viewController] navigationController]];
+}
+
 // class:string -> handle:string
 - (void)op_create_instance {
     CHECK_STACK_DEPTH(1);
@@ -362,9 +367,9 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     
     if (cls) {
         id x = class_createInstance(cls, 0);
-        [self push:[NSString stringWithFormat:@"%d", (unsigned int)x]];
+        [self push:x];
     } else {
-        [self push:@""];
+        [self push:nil];
     }
 }
 
@@ -377,35 +382,96 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     [self push:cls];
 }
 
-// handle:string, selector:string, numargs:integer, arg:id, ... -> (none)
+///////////////
+// Customize the number of sections in the table view.
+static NSInteger
+numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
+{
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+static NSInteger
+tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInteger section)
+{
+    return 0;
+}
+
+// Customize the appearance of table view cells.
+static UITableViewCell *
+tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath)
+{
+    static NSString *CellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+    }
+    
+    // Configure the cell.
+    
+    return cell;
+}
+////////////////////////
+
+// controller:UITableViewController -> table:?
+- (void)op_xxx_pushtable {
+    CHECK_STACK_DEPTH(1);
+    UITableViewController *cont = [self pop];
+    
+    UIBarButtonItem *back = [[UIBarButtonItem alloc] initWithTitle:nil style:UIBarButtonItemStyleDone target:nil action:nil];
+    [[[self viewController] navigationItem] setBackBarButtonItem:back];
+    [[self viewController] setTitle:@"Top"];
+    
+    UINavigationController *navcont = [[self viewController] navigationController];
+    [navcont pushViewController:cont animated:YES];
+
+    Class hogeClass = objc_allocateClassPair([NSObject class], "TwitterTimeLineTableView", 0);
+    objc_registerClassPair(hogeClass);
+    
+    BOOL res1 = class_addMethod(hogeClass, @selector(numberOfSectionsInTableView:), (IMP)numberOfSectionsInTableView, "i@:@");
+    BOOL res2 = class_addMethod(hogeClass, @selector(tableView:numberOfRowsInSection:), (IMP)tableView_numberOfRowsInSection, "i@:@i");
+    BOOL res3 = class_addMethod(hogeClass, @selector(tableView:cellForRowAtIndexPath:), (IMP)tableView_cellForRowAtIndexPath, "i@:@@");
+    NSLog(@"res = %d, %d, %d", res1, res2, res3);
+
+    [self push:@"hoge"];
+}
+
+// handle:string, selector:string, numargs:integer, arg:id, ... -> id
 - (void)op_send_mesg {
     CHECK_STACK_DEPTH(2);
     id obj = (id)[[self pop] integerValue];
     SEL mesg = (SEL)[[self pop] integerValue];
     int n = [[self pop] integerValue];
+    id ret = nil;
 
     CHECK_STACK_DEPTH(n);
 
     switch (n) {
         case 0:
-            objc_msgSend(obj, mesg);
+            ret = objc_msgSend(obj, mesg);
             break;
             
         case 1:
-            objc_msgSend(obj, mesg, [self pop]);
+            ret = objc_msgSend(obj, mesg, [self pop]);
             break;
             
         case 2:
-            objc_msgSend(obj, mesg, [self pop], [self pop]);
+            ret = objc_msgSend(obj, mesg, [self pop], [self pop]);
             break;
             
         case 3:
-            objc_msgSend(obj, mesg, [self pop], [self pop], [self pop]);
+            ret = objc_msgSend(obj, mesg, [self pop], [self pop], [self pop]);
             break;
             
         default:
             break;
     }
+    
+    [self push:ret];
 }
+
+
 
 @end
