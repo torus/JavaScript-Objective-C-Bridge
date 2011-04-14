@@ -387,7 +387,11 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
 static NSInteger
 numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
 {
-    return 1;
+    Class cls = objc_getClass("TwitterTimeLineTableView");
+    UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
+    NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
+    NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"numberOfSectionsInTableView\")", hndl]];
+    return [ret integerValue];
 }
 
 
@@ -395,7 +399,11 @@ numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
 static NSInteger
 tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInteger section)
 {
-    return 0;
+    Class cls = objc_getClass("TwitterTimeLineTableView");
+    UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
+    NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
+    NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_numberOfRowsInSection\", %d)", hndl, section]];
+    return [ret integerValue];
 }
 
 // Customize the appearance of table view cells.
@@ -410,6 +418,12 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     }
     
     // Configure the cell.
+    Class cls = objc_getClass("TwitterTimeLineTableView");
+    UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
+    NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
+    NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_cellForRowAtIndexPath\", %d, %d)",
+                                                                            hndl, [indexPath section], [indexPath row]]];
+    [[cell textLabel] setText:ret];
     
     return cell;
 }
@@ -424,17 +438,30 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     [[[self viewController] navigationItem] setBackBarButtonItem:back];
     [[self viewController] setTitle:@"Top"];
     
-    UINavigationController *navcont = [[self viewController] navigationController];
-    [navcont pushViewController:cont animated:YES];
-
     Class hogeClass = objc_allocateClassPair([NSObject class], "TwitterTimeLineTableView", 0);
-    objc_registerClassPair(hogeClass);
+    class_addProtocol(hogeClass, objc_getProtocol("UITableViewDataSource"));
     
     BOOL res1 = class_addMethod(hogeClass, @selector(numberOfSectionsInTableView:), (IMP)numberOfSectionsInTableView, "i@:@");
     BOOL res2 = class_addMethod(hogeClass, @selector(tableView:numberOfRowsInSection:), (IMP)tableView_numberOfRowsInSection, "i@:@i");
     BOOL res3 = class_addMethod(hogeClass, @selector(tableView:cellForRowAtIndexPath:), (IMP)tableView_cellForRowAtIndexPath, "i@:@@");
-    NSLog(@"res = %d, %d, %d", res1, res2, res3);
 
+    BOOL res4 = class_addIvar(hogeClass, "handler", sizeof(id), log2(sizeof(id)), "@");
+    BOOL res5 = class_addIvar(hogeClass, "webView", sizeof(id), log2(sizeof(id)), "@");
+
+    NSLog(@"res = %d, %d, %d, %d, %d", res1, res2, res3, res4, res5);
+
+    objc_registerClassPair(hogeClass);
+
+    id tbl = class_createInstance(hogeClass, 0);
+    [tbl init];
+    object_setIvar(tbl, class_getInstanceVariable(hogeClass, "handler"), [[NSString stringWithString:@"getData"] retain]);// FIXME: implement dealloc
+    object_setIvar(tbl, class_getInstanceVariable(hogeClass, "webView"), [[self webView] retain]);
+    NSLog(@"tbl %@", tbl);
+    [[cont tableView] setDataSource:tbl];
+    
+    UINavigationController *navcont = [[self viewController] navigationController];
+    [navcont pushViewController:cont animated:YES];
+    
     [self push:@"hoge"];
 }
 

@@ -446,6 +446,28 @@ function test_objc () {
 
 //////////////////////
 
+function getData (selector) {
+    var f = ({
+        numberOfSectionsInTableView: function () {
+            return 2;
+        },
+        tableView_numberOfRowsInSection: function (section) {
+            return 3;
+        },
+        tableView_cellForRowAtIndexPath: function (section, row) {
+            return "data " + [section, row].join ("-");
+        }
+    })[selector]
+
+    var args = []
+    for (var i = 1; i < arguments.length; i ++) {
+        args.push (arguments[i])
+    }
+    return f.apply (this, args)
+}
+
+////////////////////
+
 $(document).ready (function () {
     var consumer_secret = "QBvGYz4yTwFx1tGabhbsxE3ZXmaG01h3VRjfJoph0"
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
