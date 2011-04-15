@@ -429,9 +429,10 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
 }
 ////////////////////////
 
-// controller:UITableViewController -> table:?
+// func:string, controller:UITableViewController -> table:?
 - (void)op_xxx_pushtable {
-    CHECK_STACK_DEPTH(1);
+    CHECK_STACK_DEPTH(2);
+    NSString *func = [self pop];
     UITableViewController *cont = [self pop];
     
     UIBarButtonItem *back = [[UIBarButtonItem alloc] initWithTitle:nil style:UIBarButtonItemStyleDone target:nil action:nil];
@@ -454,7 +455,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
 
     id tbl = class_createInstance(hogeClass, 0);
     [tbl init];
-    object_setIvar(tbl, class_getInstanceVariable(hogeClass, "handler"), [[NSString stringWithString:@"getData"] retain]);// FIXME: implement dealloc
+    object_setIvar(tbl, class_getInstanceVariable(hogeClass, "handler"), [func retain]);
     object_setIvar(tbl, class_getInstanceVariable(hogeClass, "webView"), [[self webView] retain]);
     NSLog(@"tbl %@", tbl);
     [[cont tableView] setDataSource:tbl];

@@ -436,7 +436,25 @@ function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_
 function test_objc () {
     new JSBridgeStack ().
         push ("UITableViewController").operate ("look_up_class").operate ("create_instance").
-        operate ("xxx_pushtable").
+        push (make_callback (function (selector) {
+            var f = ({
+                numberOfSectionsInTableView: function () {
+                    return 2;
+                },
+                tableView_numberOfRowsInSection: function (section) {
+                    return 3;
+                },
+                tableView_cellForRowAtIndexPath: function (section, row) {
+                    return "data " + [section, row].join ("-");
+                }
+            })[selector]
+
+            var args = []
+            for (var i = 1; i < arguments.length; i ++) {
+                args.push (arguments[i])
+            }
+            return f.apply (this, args)
+        )) operate ("xxx_pushtable").
         // operate ("self")
         // operate ("send_mesg")
         pushcallback (make_callback (function (hndl) {
@@ -446,25 +464,6 @@ function test_objc () {
 
 //////////////////////
 
-function getData (selector) {
-    var f = ({
-        numberOfSectionsInTableView: function () {
-            return 2;
-        },
-        tableView_numberOfRowsInSection: function (section) {
-            return 3;
-        },
-        tableView_cellForRowAtIndexPath: function (section, row) {
-            return "data " + [section, row].join ("-");
-        }
-    })[selector]
-
-    var args = []
-    for (var i = 1; i < arguments.length; i ++) {
-        args.push (arguments[i])
-    }
-    return f.apply (this, args)
-}
 
 ////////////////////
 
