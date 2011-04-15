@@ -324,6 +324,9 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     NSString *token = [def stringForKey:@"oauth_token"];
     NSString *secret = [def stringForKey:@"oauth_token_secret"];
     
+    if (!secret) secret = @"";
+    if (!token) token = @"";
+    
     [self push:secret];
     [self push:token];
 }
@@ -391,6 +394,7 @@ numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"numberOfSectionsInTableView\")", hndl]];
+    NSLog(@"numberOfSectionsInTableView: hndl: %@, ret: %@", hndl, ret);
     return [ret integerValue];
 }
 
@@ -403,6 +407,7 @@ tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInte
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_numberOfRowsInSection\", %d)", hndl, section]];
+    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
     return [ret integerValue];
 }
 
@@ -434,6 +439,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     CHECK_STACK_DEPTH(2);
     NSString *func = [self pop];
     UITableViewController *cont = [self pop];
+    NSLog(@"xxx_pushtable: %@, %@", func, cont);
     
     UIBarButtonItem *back = [[UIBarButtonItem alloc] initWithTitle:nil style:UIBarButtonItemStyleDone target:nil action:nil];
     [[[self viewController] navigationItem] setBackBarButtonItem:back];
