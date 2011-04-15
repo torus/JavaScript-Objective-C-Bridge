@@ -177,7 +177,7 @@ function make_callback (func) {
     var name = "CALLBACK_" + (CALLBACK.length - 1).toString ()
     GLOBAL[name] = function () {
         try {
-            func.apply (this, arguments)
+            return func.apply (this, arguments)
         } catch (err) {
             alert (err)
         }
@@ -433,19 +433,19 @@ function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_
 
 //////////////////////
 
-function test_objc () {
+function test_objc (tweets) {
     new JSBridgeStack ().
         push ("UITableViewController").operate ("look_up_class").operate ("create_instance").
         push (make_callback (function (selector) {
             var f = ({
                 numberOfSectionsInTableView: function () {
-                    return 2;
+                    return 1;
                 },
                 tableView_numberOfRowsInSection: function (section) {
-                    return 3;
+                    return tweets.length;
                 },
                 tableView_cellForRowAtIndexPath: function (section, row) {
-                    return "data " + [section, row].join ("-");
+                    return "data " + tweets[row];
                 }
             })[selector]
 
@@ -453,8 +453,9 @@ function test_objc () {
             for (var i = 1; i < arguments.length; i ++) {
                 args.push (arguments[i])
             }
-            return f.apply (this, args)
-        )) operate ("xxx_pushtable").
+            var ret = f.apply (this, args)
+            return ret
+        })).operate ("xxx_pushtable").
         // operate ("self")
         // operate ("send_mesg")
         pushcallback (make_callback (function (hndl) {
@@ -472,7 +473,7 @@ $(document).ready (function () {
     var consumer_key = "7IoQbg88rT3GJ01HlTOc9A"
 
     try {
-        test_objc ()
+        test_objc ([1, 2, 3])
         // throw ("done")
 
         // new JSBridgeStack ().operate ("twitter_credential").pushcallback (make_callback (function (oauth_token, oauth_token_secret) {
@@ -482,7 +483,8 @@ $(document).ready (function () {
         //         // })
 
         //         home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, function (data) {
-        //             new JSBridgeStack ().push (data.toString ()).operate ("print").execute ()
+        //             test_objc (data)
+        //             // new JSBridgeStack ().push (data.toString ()).operate ("print").execute ()
         //         })
         //     } else {
         //         twitter_oauth (consumer_key, consumer_secret, function (oauth_token, oauth_token_secret) {
