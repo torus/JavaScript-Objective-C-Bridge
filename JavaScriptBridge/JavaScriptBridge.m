@@ -386,6 +386,8 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
 }
 
 ///////////////
+#pragma mark -
+#pragma mark UITableViewDataSource methods
 // Customize the number of sections in the table view.
 static NSInteger
 numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
@@ -442,7 +444,24 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     
     return cell;
 }
+#pragma mark UITableViewDelegate methods
+
+static CGFloat
+tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath)
+{
+    NSLog(@"tableView_heightForRowAtIndexPath: %@, %@", tableView, indexPath);
+    Class cls = objc_getClass("TwitterTimeLineTableView");
+    UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
+    NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
+    NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_heightForRowAtIndexPath\", %d, %d)",
+                                                                hndl, indexPath.section, indexPath.row]];
+    NSLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
+    return [ret floatValue];
+//    return 300.;
+}
+
 ////////////////////////
+#pragma mark -
 
 // func:string, controller:UITableViewController -> table:?
 - (void)op_xxx_pushtable {
@@ -457,6 +476,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     
     Class hogeClass = objc_allocateClassPair([NSObject class], "TwitterTimeLineTableView", 0);
     class_addProtocol(hogeClass, objc_getProtocol("UITableViewDataSource"));
+    class_addProtocol(hogeClass, objc_getProtocol("UITableViewDelegate"));
     
     BOOL res1 = class_addMethod(hogeClass, @selector(numberOfSectionsInTableView:), (IMP)numberOfSectionsInTableView, "i@:@");
     BOOL res2 = class_addMethod(hogeClass, @selector(tableView:numberOfRowsInSection:), (IMP)tableView_numberOfRowsInSection, "i@:@i");
@@ -465,7 +485,9 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     BOOL res4 = class_addIvar(hogeClass, "handler", sizeof(id), log2(sizeof(id)), "@");
     BOOL res5 = class_addIvar(hogeClass, "webView", sizeof(id), log2(sizeof(id)), "@");
 
-    NSLog(@"res = %d, %d, %d, %d, %d", res1, res2, res3, res4, res5);
+    BOOL res6 = class_addMethod(hogeClass, @selector(tableView:heightForRowAtIndexPath:), (IMP)tableView_heightForRowAtIndexPath, "f@:@@");
+
+    NSLog(@"res = %d, %d, %d, %d, %d, %d", res1, res2, res3, res4, res5, res6);
 
     objc_registerClassPair(hogeClass);
 
@@ -475,6 +497,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     object_setIvar(tbl, class_getInstanceVariable(hogeClass, "webView"), [[self webView] retain]);
     NSLog(@"tbl %@", tbl);
     [[cont tableView] setDataSource:tbl];
+    [[cont tableView] setDelegate:tbl];
     
     UINavigationController *navcont = [[self viewController] navigationController];
     [navcont pushViewController:cont animated:YES];

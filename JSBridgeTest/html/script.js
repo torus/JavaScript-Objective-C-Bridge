@@ -433,7 +433,18 @@ function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_
 
 //////////////////////
 
+function make_tweet_elem (t) {
+    var id = t.id
+    var text = t.text
+    var screen_name = t.user.screen_name
+    var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
+
+    return elem
+}
+
 function test_objc (tweets) {
+    var tweet_map = {}
+
     new JSBridgeStack ().
         push ("UITableViewController").operate ("look_up_class").operate ("create_instance").
         push (make_callback (function (selector) {
@@ -446,11 +457,28 @@ function test_objc (tweets) {
                 },
                 tableView_cellForRowAtIndexPath: function (section, row) {
                     var t = tweets[row]
-                    var id = t.id
-                    var text = t.text
-                    var screen_name = t.user.screen_name
-                    var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
+                    var elem = tweet_map[t.id]
+                    if (! elem) {
+                        elem = make_tweet_elem (t)
+                        tweet_map[t.id] = elem
+                    }
+                    // var id = t.id
+                    // var text = t.text
+                    // var screen_name = t.user.screen_name
+                    // var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
                     return elem.html ()
+                },
+                tableView_heightForRowAtIndexPath: function (section, row) {
+                    var t = tweets[row]
+                    var elem = tweet_map[t.id]
+                    if (! elem) {
+                        elem = make_tweet_elem (t)
+                        tweet_map[t.id] = elem
+                    }
+                    $("body").append (elem)
+                    var height = elem.innerHeight ()
+                    return height + 10
+                    // return 30
                 }
             })[selector]
 
