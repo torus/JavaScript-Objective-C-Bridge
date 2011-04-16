@@ -409,7 +409,7 @@ tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInte
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_numberOfRowsInSection\", %d)", hndl, section]];
-//    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
+    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
     return [ret integerValue];
 }
 
@@ -441,7 +441,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_cellForRowAtIndexPath\", %d, %d)",
                                                                 hndl, [indexPath section], [indexPath row]]];
 
-    CGFloat height = tableView_heightForRowAtIndexPath(self, sel, tableView, indexPath) - 10;
+    CGFloat height = tableView_heightForRowAtIndexPath(self, sel, tableView, indexPath);
 
     UIWebView *cell_wv = (UIWebView*)[cell viewWithTag:TWITTER_TABLE_CELL_WEBVIEW];
     CGRect rect = [cell frame];
@@ -459,14 +459,14 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
 static CGFloat
 tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath)
 {
-    NSLog(@"tableView_heightForRowAtIndexPath: %@, %@", tableView, indexPath);
+//    NSLog(@"tableView_heightForRowAtIndexPath: %@, %@", tableView, indexPath);
     Class cls = objc_getClass("TwitterTimeLineTableView");
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_heightForRowAtIndexPath\", %d, %d)",
                                                                 hndl, indexPath.section, indexPath.row]];
-    NSLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
-    return [ret floatValue] + 10;
+//    NSLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
+    return [ret floatValue];
 }
 
 ////////////////////////

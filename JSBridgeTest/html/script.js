@@ -437,7 +437,9 @@ function make_tweet_elem (t) {
     var id = t.id
     var text = t.text
     var screen_name = t.user.screen_name
-    var elem = $("<div>").append ($("<div>").css ({margin: "0px"}).append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text)))
+    var elem = $("<div>").css ({margin: "0px", "max-width": "320px"}).
+        append ($("<p>").css ({margin: "0px"}).text ("@" + screen_name)).
+        append ($("<p>").css ({margin: "0px"}).text (text))
 
     return elem
 }
@@ -462,11 +464,8 @@ function test_objc (tweets) {
                         elem = make_tweet_elem (t)
                         tweet_map[t.id] = elem
                     }
-                    // var id = t.id
-                    // var text = t.text
-                    // var screen_name = t.user.screen_name
-                    // var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
-                    return elem.html ()
+                    var outer = $("<html>").append ($("<body>").css ({margin: "0px", padding: "0px"})).append (elem)
+                    return outer.html ()
                 },
                 tableView_heightForRowAtIndexPath: function (section, row) {
                     var t = tweets[row]
@@ -475,10 +474,10 @@ function test_objc (tweets) {
                         elem = make_tweet_elem (t)
                         tweet_map[t.id] = elem
                     }
-                    $("body").append (elem)
-                    var height = elem.innerHeight ()
-                    return height + 10
-                    // return 30
+                    var outer = $("<div>").append (elem)
+                    $("body").append (outer)
+                    var height = outer.innerHeight ()
+                    return height
                 }
             })[selector]
 
