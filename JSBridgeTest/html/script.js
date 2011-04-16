@@ -445,7 +445,12 @@ function test_objc (tweets) {
                     return tweets.length;
                 },
                 tableView_cellForRowAtIndexPath: function (section, row) {
-                    return "data " + tweets[row];
+                    var t = tweets[row]
+                    var id = t.id
+                    var text = t.text
+                    var screen_name = t.user.screen_name
+                    var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
+                    return elem.html ()
                 }
             })[selector]
 
