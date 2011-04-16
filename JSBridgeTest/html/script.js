@@ -437,7 +437,7 @@ function make_tweet_elem (t) {
     var id = t.id
     var text = t.text
     var screen_name = t.user.screen_name
-    var elem = $("<div>").append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text))
+    var elem = $("<div>").append ($("<div>").css ({margin: "0px"}).append ($("<div>").text ("@" + screen_name).css ({margin:"0px"})).append ($("<p>").css ({margin: "0px"}).text (text)))
 
     return elem
 }

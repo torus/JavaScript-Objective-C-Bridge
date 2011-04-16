@@ -409,9 +409,11 @@ tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInte
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_numberOfRowsInSection\", %d)", hndl, section]];
-    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
+//    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
     return [ret integerValue];
 }
+
+static CGFloat tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath);
 
 // Customize the appearance of table view cells.
 static UITableViewCell *
@@ -437,9 +439,17 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_cellForRowAtIndexPath\", %d, %d)",
-                                                                            hndl, [indexPath section], [indexPath row]]];
-//    [[cell textLabel] setText:ret];
+                                                                hndl, [indexPath section], [indexPath row]]];
+
+    CGFloat height = tableView_heightForRowAtIndexPath(self, sel, tableView, indexPath) - 10;
+
     UIWebView *cell_wv = (UIWebView*)[cell viewWithTag:TWITTER_TABLE_CELL_WEBVIEW];
+    CGRect rect = [cell frame];
+    rect.origin.x = 0;
+    rect.origin.y = 0;
+    rect.size.height = height;
+    [cell_wv setFrame:rect];
+//    NSLog(@"row: %d, HTML: %@", [indexPath row], ret);
     [cell_wv loadHTMLString:ret baseURL:nil];
     
     return cell;
@@ -456,8 +466,7 @@ tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIn
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_heightForRowAtIndexPath\", %d, %d)",
                                                                 hndl, indexPath.section, indexPath.row]];
     NSLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
-    return [ret floatValue];
-//    return 300.;
+    return [ret floatValue] + 10;
 }
 
 ////////////////////////
