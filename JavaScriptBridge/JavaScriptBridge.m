@@ -416,10 +416,18 @@ static UITableViewCell *
 tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath)
 {
     static NSString *CellIdentifier = @"Cell";
+    enum {
+        TWITTER_TABLE_CELL_WEBVIEW = 1,
+    };
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        CGRect webViewFrame = [[cell contentView] frame];
+        UIWebView *wv = [[UIWebView alloc] initWithFrame:webViewFrame];
+        [cell addSubview:wv];
+        [wv setTag:TWITTER_TABLE_CELL_WEBVIEW];
+        [wv release];
     }
     
     // Configure the cell.
@@ -428,7 +436,9 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_cellForRowAtIndexPath\", %d, %d)",
                                                                             hndl, [indexPath section], [indexPath row]]];
-    [[cell textLabel] setText:ret];
+//    [[cell textLabel] setText:ret];
+    UIWebView *cell_wv = (UIWebView*)[cell viewWithTag:TWITTER_TABLE_CELL_WEBVIEW];
+    [cell_wv loadHTMLString:ret baseURL:nil];
     
     return cell;
 }
