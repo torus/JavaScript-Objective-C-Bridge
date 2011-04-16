@@ -364,7 +364,7 @@ function oauth_request_token (consumer_key, consumer_secret, cont) {
     var base = oauth_make_signature_base (url, method, params)
 
     new JSBridgeStack ().push (base, consumer_secret + "&").operate ("hmac_sha1").operate ("base64data").pushcallback (make_callback (function (sig) {
-        $("pre").append ("\n" + "oauth_request_token: signature: " + sig)
+        // $("pre").append ("\n" + "oauth_request_token: signature: " + sig)
 
         var auth = make_oauth_header (params, sig)
 
@@ -389,7 +389,7 @@ function twitter_oauth (consumer_key, consumer_secret, cont) {
             var oauth_token_secret = stat.browser_handle
 
             var res = __hex (data)
-            $("pre").append ("\n" + "OAuth callback: " + res)
+            // $("pre").append ("\n" + "OAuth callback: " + res)
 
             new JSBridgeStack ().push ("OAuth callback: " + res).operate ("print").
                 push (browser_handle).operate ("close_browser").
@@ -403,7 +403,7 @@ function twitter_oauth (consumer_key, consumer_secret, cont) {
 }
 
 function home_timeline (consumer_key, consumer_secret, oauth_token, oauth_token_secret, cont) {
-    $("pre").append ("\nhome_timeline: \n -" + [consumer_key, consumer_secret, oauth_token, oauth_token_secret, cont].join ("\n -"))
+    // $("pre").append ("\nhome_timeline: \n -" + [consumer_key, consumer_secret, oauth_token, oauth_token_secret, cont].join ("\n -"))
 
     var params = {
         oauth_consumer_key: consumer_key,
@@ -477,6 +477,7 @@ function test_objc (tweets) {
                     var outer = $("<div>").append (elem)
                     $("body").append (outer)
                     var height = outer.innerHeight ()
+                    outer.remove ()
                     return height
                 }
             })[selector]
