@@ -6,6 +6,7 @@
 //  Copyright 2011 Kronecker's Delta Studio. All rights reserved.
 //
 
+#import "Util.h"
 #import "JavaScriptBridgeReceiver.h"
 
 @implementation JavaScriptBridgeReceiver
@@ -30,11 +31,11 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *url = [request URL];
     NSString *scheme = [url scheme];
-    NSLog(@"url: %@", url);
+    DebugLog(@"url: %@", url);
     
     if ([scheme isEqualToString:@"bridge"]) {
         NSArray *path = [url pathComponents];
-        NSLog(@"path: %@", path);
+        DebugLog(@"path: %@", path);
         
         [self performSelector:@selector(feedInstructions:) withObject:path afterDelay:0];
         
@@ -60,7 +61,7 @@
     for (NSString *str in instructions) {
         unichar head = [str characterAtIndex:0];
         NSString *tail = [str substringFromIndex:1];
-        NSLog(@"-- begin %@", str);
+        DebugLog(@"-- begin %@", str);
         switch (head) {
             case '-':// operand
                 [[self bridge] push:tail];
@@ -71,7 +72,7 @@
             default:
                 break;
         }
-        NSLog(@"-- end %@", str);
+        DebugLog(@"-- end %@", str);
     }
 }
 

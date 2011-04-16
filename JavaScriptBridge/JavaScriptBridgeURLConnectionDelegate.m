@@ -7,7 +7,7 @@
 //
 
 #import "JavaScriptBridgeURLConnectionDelegate.h"
-
+#import "Util.h"
 
 @implementation JavaScriptBridgeURLConnectionDelegate
 
@@ -26,7 +26,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSString *err = [NSString stringWithFormat:@"%@", error];
-    NSLog(@"didFailWithError: %@", err);
+    DebugLog(@"didFailWithError: %@", err);
     [[self webView] stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"connectionDidFailWithError(%d, \"%@\")", [self connectionID], err]];
 }
 

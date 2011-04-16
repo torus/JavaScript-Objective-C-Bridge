@@ -6,6 +6,7 @@
 //  Copyright 2011 Avatar Reality Inc. All rights reserved.
 //
 
+#import "Util.h"
 #import "JavaScriptBridge.h"
 #import "NSStringAdditions.h"
 #import "JavaScriptBridgeURLConnectionDelegate.h"
@@ -20,13 +21,13 @@
 - (id)init {
 	[super init];
 	[self setStack:[[NSMutableArray alloc] init]];
-	NSLog(@"init: %@", self);
+	DebugLog(@"init: %@", self);
 	return self;
 }
 
 - (void)push:(NSString*)operand {
 	[[self stack] addObject:operand];
-	NSLog(@"pushed: %@, [%d]", operand, [self stackDepth]);
+	DebugLog(@"pushed: %@, [%d]", operand, [self stackDepth]);
 }
 
 - (id)pop {
@@ -41,7 +42,7 @@
 }
 
 - (void)operate:(NSString*)op {
-	NSLog(@"--> [%d]", [self stackDepth]);
+	DebugLog(@"--> [%d]", [self stackDepth]);
 	NSString *func = [NSString stringWithFormat:@"op_%@", op];
 	char buf[128];
 	[func getCString:buf maxLength:sizeof(buf) encoding:NSUTF8StringEncoding];
@@ -49,19 +50,19 @@
 	if ([self respondsToSelector:sel]) {
 		objc_msgSend(self, sel);
 	} else {
-		NSLog(@"unknown operator: %@", op);
+		DebugLog(@"unknown operator: %@", op);
 	}
-	NSLog(@"--> [%d]", [self stackDepth]);
+	DebugLog(@"--> [%d]", [self stackDepth]);
 }
 
 - (void)error:(NSString*)mesg {
-	NSLog(@"JavaScript bridge error: %@", mesg);
+	DebugLog(@"JavaScript bridge error: %@", mesg);
 }
 
 #define CHECK_STACK_DEPTH_WITH_FAIL(n, fail) \
 do {\
     const char *name = sel_getName(_cmd);\
-    NSLog(@"method = %s", name);\
+    DebugLog(@"method = %s", name);\
     if ([self stackDepth] < (n)) {\
         [self error:[NSString stringWithFormat:@"%s: stack underflow", name]];\
         return fail;\
@@ -112,8 +113,7 @@ do {\
 - (void)op_print {
     CHECK_STACK_DEPTH(1);
 
-    NSString *str = [NSString stringWithFormat:@"%@", [self pop]];
-    NSLog(@"print: %@", str);
+    DebugLog(@"print: %@", [NSString stringWithFormat:@"%@", [self pop]]);
 }
 
 // src:string -> data
@@ -139,7 +139,7 @@ do {\
         }
     }
     
-    NSLog(@"hexstr: %@", data);
+    DebugLog(@"hexstr: %@", data);
     [self push:data];
     [data release];
 }
@@ -153,7 +153,7 @@ do {\
     
     NSInteger n = [num integerValue];
     
-    NSLog(@"callback: [%d] num: %@, %d, func: %@", [self stackDepth], num, n, funcname);
+    DebugLog(@"callback: [%d] num: %@, %d, func: %@", [self stackDepth], num, n, funcname);
     
     CHECK_STACK_DEPTH(n);
 
@@ -170,13 +170,13 @@ do {\
     
     NSString *arglist = n > 0 ? [NSString stringWithFormat:@"\"%@\"", [args componentsJoinedByString:@"\",\""]] : @"";
     NSString *expr = [NSString stringWithFormat:@"%@(%@)", funcname, arglist];
-    NSLog(@"callback: %@", expr);
+    DebugLog(@"callback: %@", expr);
     [self performSelector:@selector(eval:) withObject:expr afterDelay:0];
     [args release];
 }
 
 - (void)eval:(NSString*)expr {
-    NSLog(@"eval: %@ -> webView: %@", expr, [self webView]);
+    DebugLog(@"eval: %@ -> webView: %@", expr, [self webView]);
     [[self webView] stringByEvaluatingJavaScriptFromString:expr];
 }
 
@@ -214,7 +214,7 @@ do {\
     CHECK_STACK_DEPTH(2);
     
     NSString *key = [self pop];
-    NSLog(@"hmac_sha1: key: %@", key);
+    DebugLog(@"hmac_sha1: key: %@", key);
     
 		// The length does not include space for a terminating NULL character.
     NSInteger keylen = [key lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
@@ -223,7 +223,7 @@ do {\
     [key getCString:keybuf maxLength:keylen + 1 encoding:NSASCIIStringEncoding];
     
     NSString *str = [self pop];
-    NSLog(@"hmac_sha1: str: %@", str);
+    DebugLog(@"hmac_sha1: str: %@", str);
     
 		// The length does not include space for a terminating NULL character.
     NSInteger datalen = [str lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
@@ -311,7 +311,7 @@ returnHTTPHandle (JavaScriptBridge *self, SEL _cmd, NSURLRequest *req)
     NSString *token = [self pop];
     NSString *secret = [self pop];
     
-    NSLog(@"token = %@, secret = %@", token, secret);
+    DebugLog(@"token = %@, secret = %@", token, secret);
     
     NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
     [def setValue:token forKey:@"oauth_token"];
@@ -396,7 +396,7 @@ numberOfSectionsInTableView(id self, SEL sel, UITableView *tableView)
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"numberOfSectionsInTableView\")", hndl]];
-    NSLog(@"numberOfSectionsInTableView: hndl: %@, ret: %@", hndl, ret);
+    DebugLog(@"numberOfSectionsInTableView: hndl: %@, ret: %@", hndl, ret);
     return [ret integerValue];
 }
 
@@ -409,7 +409,7 @@ tableView_numberOfRowsInSection(id self, SEL sel, UITableView *tableView, NSInte
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_numberOfRowsInSection\", %d)", hndl, section]];
-    NSLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
+    DebugLog(@"tableView_numberOfRowsInSection: hndl: %@, ret: %@, section: %d", hndl, ret, section);
     return [ret integerValue];
 }
 
@@ -449,7 +449,7 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
     rect.origin.y = 0;
     rect.size.height = height;
     [cell_wv setFrame:rect];
-//    NSLog(@"row: %d, HTML: %@", [indexPath row], ret);
+//    DebugLog(@"row: %d, HTML: %@", [indexPath row], ret);
     [cell_wv loadHTMLString:ret baseURL:nil];
     
     return cell;
@@ -459,13 +459,13 @@ tableView_cellForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSInde
 static CGFloat
 tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIndexPath *indexPath)
 {
-//    NSLog(@"tableView_heightForRowAtIndexPath: %@, %@", tableView, indexPath);
+//    DebugLog(@"tableView_heightForRowAtIndexPath: %@, %@", tableView, indexPath);
     Class cls = objc_getClass("TwitterTimeLineTableView");
     UIWebView *wv = object_getIvar(self, class_getInstanceVariable(cls, "webView"));
     NSString *hndl = object_getIvar(self, class_getInstanceVariable(cls, "handler")); 
     NSString *ret = [wv stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"%@(\"tableView_heightForRowAtIndexPath\", %d, %d)",
                                                                 hndl, indexPath.section, indexPath.row]];
-//    NSLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
+//    DebugLog(@"tableView_heightForRowAtIndexPath: hndl: %@, ret: %@, section: %d", hndl, ret, indexPath.section, indexPath.row);
     return [ret floatValue];
 }
 
@@ -477,7 +477,7 @@ tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIn
     CHECK_STACK_DEPTH(2);
     NSString *func = [self pop];
     UITableViewController *cont = [self pop];
-    NSLog(@"xxx_pushtable: %@, %@", func, cont);
+    DebugLog(@"xxx_pushtable: %@, %@", func, cont);
     
     UIBarButtonItem *back = [[UIBarButtonItem alloc] initWithTitle:nil style:UIBarButtonItemStyleDone target:nil action:nil];
     [[[self viewController] navigationItem] setBackBarButtonItem:back];
@@ -496,7 +496,10 @@ tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIn
 
     BOOL res6 = class_addMethod(hogeClass, @selector(tableView:heightForRowAtIndexPath:), (IMP)tableView_heightForRowAtIndexPath, "f@:@@");
 
-    NSLog(@"res = %d, %d, %d, %d, %d, %d", res1, res2, res3, res4, res5, res6);
+    DebugLog(@"res = %d, %d, %d, %d, %d, %d", res1, res2, res3, res4, res5, res6);
+    if (!(res1 && res2 && res3 && res4 && res5 && res6)) {
+        ErrorLog(@"Failed to create a class: %d, %d, %d, %d, %d, %d", res1, res2, res3, res4, res5, res6);
+    }
 
     objc_registerClassPair(hogeClass);
 
@@ -504,7 +507,7 @@ tableView_heightForRowAtIndexPath(id self, SEL sel, UITableView *tableView, NSIn
     [tbl init];
     object_setIvar(tbl, class_getInstanceVariable(hogeClass, "handler"), [func retain]);
     object_setIvar(tbl, class_getInstanceVariable(hogeClass, "webView"), [[self webView] retain]);
-    NSLog(@"tbl %@", tbl);
+    DebugLog(@"tbl %@", tbl);
     [[cont tableView] setDataSource:tbl];
     [[cont tableView] setDelegate:tbl];
     
