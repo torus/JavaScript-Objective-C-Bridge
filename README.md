@@ -22,7 +22,17 @@ A path component beginning with `-` means a operand, and a path component beginn
 Operators are defined as methods of the `JavaScriptBridge` class.  See the source code for more detail.
 
 
-License
+How It Works
+-------------------
+
+JavaScript code sends a list of instructions to the delegate object through the `location.href` property.
+Each instruction is packed in a path part in a URL.
+This list of instructions is processed by a stack machine implemented in the delegate object.
+
+Objective-C code sends message via `stringByEvaluatingJavaScriptFromString:` method on UIWebView class.
+
+
+License (BSD License)
 -------
 
 Copyright (c) 2011, Toru Hisai
