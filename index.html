@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>JavaScript-Objective-C Bridge by torus</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/torus/JavaScript-Objective-C-Bridge">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/torus/JavaScript-Objective-C-Bridge/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/torus/JavaScript-Objective-C-Bridge/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>JavaScript-Objective-C Bridge</h1>
+          <p>Function call interface between JavaScript on UIWebView and Objective-C.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/torus">torus</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>JavaScript-Objective-C Bridge</h1>
+
+<p>The JavaScript-Objective-C bridge lets you call Objective-C functions from JavaScript code loaded in a UIWebView instance.</p>
+
+<p>Note that this project is currently VERY VERY ALPHA state. Please don't use it:)</p>
+
+<h2>Demo Video</h2>
+
+<p><a href="http://www.youtube.com/watch?v=sbs7L4WUhU4">See on YouTube</a></p>
+
+<h2>Low Level API</h2>
+
+<p>Pass operands and operators through the <code>location.href</code> property.
+The path part of the specifined URL is used to represent a sequence of instruction.
+JavaScript-Objective-C bridge bridge works as a stack machine.</p>
+
+<p>For example:</p>
+
+<pre><code>location.href = "bridge:///-123/-456/@add/-hoge/-1/@callback"
+</code></pre>
+
+<p>In this example, list of instructions is represented as <code>-123/-456/@add/-hoge/-1/@callback</code>.
+A path component beginning with <code>-</code> means a operand, and a path component beginning with <code>@</code> means operator.</p>
+
+<p>Operators are defined as methods of the <code>JavaScriptBridge</code> class.  See the source code for more detail.</p>
+
+<h2>How It Works</h2>
+
+<p>JavaScript code sends a list of instructions to the delegate object through the <code>location.href</code> property.
+Each instruction is packed in a path part in a URL.
+This list of instructions is processed by a stack machine implemented in the delegate object.</p>
+
+<p>Objective-C code sends message via <code>stringByEvaluatingJavaScriptFromString:</code> method on UIWebView class.</p>
+
+<h2>License (BSD License)</h2>
+
+<p>Copyright (c) 2011, Toru Hisai
+All rights reserved.</p>
+
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+
+<ul>
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+</ul><p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+<h2>Author</h2>
+
+<p>Toru Hisai <a href="http://twitter.com/torus">@torus</a></p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
